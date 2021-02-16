@@ -15,4 +15,9 @@ jobs:
       - uses: actions/checkout@v2
       - uses: github/super-linter@v3.14.5
         env:
+          FILTER_REGEX_EXCLUDE:
+            # Visual Studio Code configuration is JSONC, so exclude those files
+            # from `jsonlint`; see https://github.com/zaach/jsonlint/issues/50
+            ".*\\.vscode/.+\\.json$"
+
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
