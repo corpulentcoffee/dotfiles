@@ -1,0 +1,18 @@
+# GitHub Actions workflow definition
+# https://docs.github.com/actions/reference/workflow-syntax-for-github-actions
+
+name: Pull request
+
+on:
+  pull_request:
+    branches: [master]
+
+jobs:
+  linter:
+    name: Super-Linter checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: github/super-linter@v3.14.5
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
