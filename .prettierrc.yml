@@ -1,0 +1,4 @@
+# Prettier formatting options
+# https://prettier.io/docs/en/options.html
+
+proseWrap: always # break long markdown lines into shorter ones

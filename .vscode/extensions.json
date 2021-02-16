@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    /**
+     * Provide autoformatting for markdown, JSON, YAML, and some others. See
+     * `.prettierrc.yml` for options controlling autoformatting behavior.
+     */
+    "esbenp.prettier-vscode"
+  ]
+}
