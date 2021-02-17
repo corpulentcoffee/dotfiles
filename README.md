@@ -1,5 +1,13 @@
 # Personal dotfiles
 
+## Repository layout
+
+Note that [`home/`](home) contains the files to be installed into the user home
+directory, which keeps those files separate from things needed to maintain and
+use the repository. Thus, [`.vscode/`](.vscode) contains Visual Studio Code
+configuration pertinent to maintaining this repository; it does _not_ contain
+files to be installed into `~/.config/Code/User/`.
+
 ## References
 
 - [GitHub does dotfiles](https://dotfiles.github.io/) has various tips for
