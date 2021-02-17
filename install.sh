@@ -4,8 +4,10 @@ set -euETo pipefail
 shopt -s inherit_errexit
 cd "$(dirname "${BASH_SOURCE[0]}")/home"
 
-skipCount=0
+okayCount=0
+failCount=0
 copyCount=0
+linkCount=0
 
 while IFS='' read -rd '' srcPath; do
   srcDir="$(dirname "$srcPath")"
@@ -21,8 +23,10 @@ while IFS='' read -rd '' srcPath; do
     srcReal="$(realpath "$srcPath")"
     dstLink="$(readlink --canonicalize "$dstPath")"
 
-    if [ "$srcReal" != "$dstLink" ]; then
-      ((++skipCount))
+    if [ "$srcReal" == "$dstLink" ]; then
+      ((++okayCount))
+    else
+      ((++failCount))
       echo "$srcPath: $dstPath already linked to $dstLink instead of $srcReal"
     fi
   elif [ -f "$dstPath" ]; then
@@ -31,23 +35,16 @@ while IFS='' read -rd '' srcPath; do
     cp --verbose "$dstPath" "$srcPath"
     ln --force --relative --symbolic --verbose "$srcPath" "$dstPath"
   else
+    ((++linkCount))
     mkdir --parents --verbose "$dstDir"
     ln --relative --symbolic --verbose "$srcPath" "$dstPath"
   fi
 done < <(find . -type f -print0)
 
-if [[ "$skipCount" -gt 0 || "$copyCount" -gt 0 ]]; then
-  if [ "$skipCount" -eq 1 ]; then
-    echo 'One file could not be installed.' >&2
-  elif [ "$skipCount" -gt 0 ]; then
-    echo "$skipCount files could not be installed." >&2
-  fi
+echo
+echo "already installed: $okayCount"
+echo "failed to install: $failCount"
+echo "needs reconciling: $copyCount"
+echo "cleanly installed: $linkCount"
 
-  if [ "$copyCount" -eq 1 ]; then
-    echo 'One file already exists and needs to be reconciled.' >&2
-  elif [ "$copyCount" -gt 0 ]; then
-    echo "$copyCount files already exist and need to be reconciled." >&2
-  fi
-
-  exit 1
-fi
+test "$failCount" -eq 0 && test "$copyCount" -eq 0
