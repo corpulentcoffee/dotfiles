@@ -1,6 +1,13 @@
 {
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
+  /** Assumes `black` already present, like via `pip3 install --user` or apt. */
+  "python.formatting.provider": "black",
+
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
+
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"
   }
