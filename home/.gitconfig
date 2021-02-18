@@ -1,3 +1,6 @@
+[alias]
+	up = fetch --all --prune --tags --verbose
+
 [user]
 	name = Dave Shifflett
 	email = dave@corpulent.coffee
