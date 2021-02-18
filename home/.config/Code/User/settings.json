@@ -8,5 +8,12 @@
      */
     "'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
   "editor.fontLigatures": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "editor.tabSize": 2,
+
+  "[python]": {
+    "editor.rulers": [79],
+    "editor.tabSize": 4
+  }
 }
