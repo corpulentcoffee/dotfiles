@@ -1,4 +1,5 @@
 {
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily":
     /**
      * Cascadia Code, which can be installed via Ubuntu's `fonts-cascadia-code`
@@ -6,5 +7,6 @@
      * be enabled for these to be rendered.
      */
     "'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
-  "editor.fontLigatures": true
+  "editor.fontLigatures": true,
+  "editor.formatOnSave": true
 }
