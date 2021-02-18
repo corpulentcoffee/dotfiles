@@ -12,6 +12,9 @@
   "editor.rulers": [80],
   "editor.tabSize": 2,
 
+  "telemetry.enableCrashReporter": false,
+  "telemetry.enableTelemetry": false,
+
   "[python]": {
     "editor.rulers": [79],
     "editor.tabSize": 4
