@@ -8,6 +8,11 @@ shopt -s inherit_errexit
 # but more conservative, with greater opportunities to confirm or bail out of
 # what is happening.
 
+function msg() {
+  echo
+  echo "$*..."
+}
+
 repoToplevel="$(git rev-parse --show-toplevel)"
 cd "$repoToplevel"
 
@@ -19,7 +24,7 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
   for newFile in "${newFiles[@]}"; do
     read -rp "Add $newFile? "
     if [[ $REPLY =~ ^[Yy]$ ]]; then
-      git stage --intent-to-add "$newFile"
+      git stage --intent-to-add --verbose -- "$newFile"
     fi
   done
 
@@ -28,11 +33,14 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
   # Note that `git commit` returns a non-zero status if nothing is commited.
   git commit --patch "$@" || true
 
-  git pull --autostash --rebase
+  msg 'Stashing and then rebasing this branch on remote, if needed'
+  git pull --autostash --rebase --verbose
 else # clean working directory
-  git pull --rebase
+  msg 'Rebasing this branch on remote, if needed'
+  git pull --rebase --verbose
 fi
 
+msg 'Updating remote with local changes'
 git push --verbose
 
 # Special but not totally uncommon case: secondary remote for the trunk branch.
@@ -41,8 +49,10 @@ git push --verbose
 readonly backupRemote=backups
 if [[ $repoBranch =~ ^refs/heads/ma(in|ster)$ ]] &&
   [ -n "$(git branch --remotes --list "$backupRemote/${repoBranch##*/}")" ]; then
-  git push --verbose "$backupRemote" "${repoBranch##*/}"
+  msg "Updating $backupRemote remote"
+  git push --verbose -- "$backupRemote" "${repoBranch##*/}"
 fi
 
-# Discover other changes on remote(s) unrelated to current branch
+# Discover other changes on remote(s) unrelated to current branch.
+msg 'Discovering other changes on remotes'
 git up
