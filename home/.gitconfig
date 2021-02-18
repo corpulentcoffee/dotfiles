@@ -1,0 +1,14 @@
+[alias]
+	graph = ! log git-graph
+	staged = diff --staged
+	sync = ! commit git-sync
+	up = fetch --all --prune --tags --verbose
+	whoami = ! git var -l | grep '^GIT_.*_IDENT'
+
+[rebase]
+	autoSquash = true
+	autoStash = true
+
+[user]
+	name = Dave Shifflett
+	email = dave@corpulent.coffee
