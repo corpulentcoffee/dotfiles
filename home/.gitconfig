@@ -1,4 +1,5 @@
 [alias]
+	staged = diff --staged
 	up = fetch --all --prune --tags --verbose
 
 [user]
