@@ -4,6 +4,9 @@
   /** Assumes `black` already present, like via `pip3 install --user` or apt. */
   "python.formatting.provider": "black",
 
+  /** Requires Microsoft's Pylance extension; see `extensions.json`. */
+  "python.languageServer": "Pylance",
+
   "[python]": {
     "editor.defaultFormatter": "ms-python.python"
   },
