@@ -2,6 +2,10 @@
 	staged = diff --staged
 	up = fetch --all --prune --tags --verbose
 
+[rebase]
+	autoSquash = true
+	autoStash = true
+
 [user]
 	name = Dave Shifflett
 	email = dave@corpulent.coffee
