@@ -1,6 +1,7 @@
 [alias]
 	graph = ! log git-graph
 	staged = diff --staged
+	sync = ! commit git-sync
 	up = fetch --all --prune --tags --verbose
 
 [rebase]
