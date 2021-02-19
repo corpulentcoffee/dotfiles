@@ -23,16 +23,20 @@ jobs:
             # this repository uses Prettier anyway
             false
 
-          VALIDATE_PYTHON_PYLINT: false # use Pyright instead; see below
+          # Some built-in Python-related features from the Super-Linter are
+          # disabled here in favor of the "Python checks" below.
+          VALIDATE_PYTHON_BLACK: false
+          VALIDATE_PYTHON_PYLINT: false
 
-  pyright:
-    name: Pyright checks
+  python:
+    name: Python checks
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v2
         with:
           python-version: "3.8.5" # as on Ubuntu 20.04
-      - run: pip install boto3 # required for pyright to check some scripts
+      - run: pip install black boto3
+      - run: black --check .
       - run: npm ci # use whatever Node environment runner has; shouldn't matter
       - run: node_modules/.bin/pyright
