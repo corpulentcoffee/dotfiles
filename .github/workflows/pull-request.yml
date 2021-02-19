@@ -30,5 +30,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: actions/setup-python@v2
+        with:
+          python-version: "3.8.5" # as on Ubuntu 20.04
+      - run: pip install boto3 # required for pyright to check some scripts
       - run: npm ci # use whatever Node environment runner has; shouldn't matter
       - run: node_modules/.bin/pyright
