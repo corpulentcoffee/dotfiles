@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
 
 from argparse import ArgumentParser
-from boto3 import Session
 from os import getenv
 from typing import List, Optional, Tuple
+
+from boto3 import Session
 
 Retention = Optional[int]
 GroupRetention = Tuple[str, Retention]
