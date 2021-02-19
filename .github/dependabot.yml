@@ -7,3 +7,7 @@ updates:
   - directory: / # for .github/workflows
     package-ecosystem: github-actions
     schedule: { interval: daily } # every weekday, Monday thru Friday
+
+  - directory: / # for pyright
+    package-ecosystem: npm
+    schedule: { interval: daily }
