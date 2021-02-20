@@ -1,4 +1,5 @@
 {
+  "editor.codeActionsOnSave": { "source.organizeImports": true },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
 
   /** Assumes `black` already present, like via `pip3 install --user` or apt. */
