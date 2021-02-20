@@ -4,6 +4,12 @@ set -euETo pipefail
 shopt -s inherit_errexit
 cd "$(dirname "${BASH_SOURCE[0]}")/home"
 
+if [[ ! "$HOME" =~ ^/ ]]; then
+  # HOME needs to be absolute given that we just changed directories above.
+  echo 'HOME must be set and must be using an absolute path.' >&2
+  exit 1
+fi
+
 okayCount=0
 failCount=0
 copyCount=0
