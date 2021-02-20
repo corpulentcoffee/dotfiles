@@ -1,5 +1,17 @@
 {
+  "editor.codeActionsOnSave": { "source.organizeImports": true },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.formatOnSave": true,
+
+  /** Assumes `black` already present, like via `pip3 install --user` or apt. */
+  "python.formatting.provider": "black",
+
+  /** Requires Microsoft's Pylance extension; see `extensions.json`. */
+  "python.languageServer": "Pylance",
+
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.python"
+  },
 
   "[shellscript]": {
     "editor.defaultFormatter": "foxundermoon.shell-format"

@@ -7,9 +7,14 @@
   repository; thus, [`.vscode/`](.vscode) contains Visual Studio Code
   configuration pertinent to maintaining this repository and does _not_ contain
   files to be installed into `~/.config/Code/User/`
-- [`install.sh`](install.sh) creates destination directories and then symlinks
-  files _individually_, rather than symlink entire directories, allowing finer
-  control over which files are kept in version control
+- [`install.sh`](install.sh) sets up the home directory
+  - rather than symlink entire directories, individual files are symlinked after
+    creating their directories, allowing finer control over which files are kept
+    in version control
+  - for better ergonomics, [`bin` scripts](home/bin) are symlinked without their
+    extension; additionally, Python scripts are symlinked in kebab case (which
+    is easier to type) rather than the in-repoistory snake case (which is
+    `import`able)
 
 ## References
 

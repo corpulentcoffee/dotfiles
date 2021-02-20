@@ -6,9 +6,13 @@
      */
     "esbenp.prettier-vscode",
 
-    /**
-     * Provide autoformatting for shell scripts and some others.
-     */
-    "foxundermoon.shell-format"
+    /** Provide autoformatting for shell scripts and some others. */
+    "foxundermoon.shell-format",
+
+    /** Autoformatting and more; see also `settings.json`. */
+    "ms-python.python",
+
+    /** Language server typechecking w/ pyright; see also `settings.json` */
+    "ms-python.vscode-pylance"
   ]
 }

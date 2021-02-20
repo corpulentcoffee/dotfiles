@@ -10,14 +10,17 @@ copyCount=0
 linkCount=0
 
 while IFS='' read -rd '' srcPath; do
-  srcDir="$(dirname "$srcPath")"
-  dstDir="$HOME/$srcDir"
-  dstPath="$HOME/$srcPath"
-
-  # Special case: install Python and shell script bin files without suffix.
-  if [[ "$srcDir" == './bin' && "$srcPath" =~ \.(py|sh)$ ]]; then
-    dstPath="${dstPath%.*}"
+  # Install Python and shell script bin files without suffix, and switch Python
+  # scripts from importable snake case to ergonomic kebab case.
+  if [[ "$srcPath" =~ ^\./bin/[a-z0-9_-]+\.(py|sh)$ ]]; then
+    dstPath="${srcPath%.*}"
+    if [[ "$srcPath" =~ \.py$ ]]; then
+      dstPath="${dstPath//_/-}"
+    fi
+  else
+    dstPath="$srcPath"
   fi
+  dstPath="$HOME/${dstPath#./}"
 
   if [ -L "$dstPath" ]; then
     srcReal="$(realpath "$srcPath")"
@@ -36,7 +39,7 @@ while IFS='' read -rd '' srcPath; do
     ln --force --relative --symbolic --verbose "$srcPath" "$dstPath"
   else
     ((++linkCount))
-    mkdir --parents --verbose "$dstDir"
+    mkdir --parents --verbose "$(dirname "$dstPath")"
     ln --relative --symbolic --verbose "$srcPath" "$dstPath"
   fi
 done < <(find . -type f -print0)
