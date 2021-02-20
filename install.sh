@@ -10,6 +10,10 @@ copyCount=0
 linkCount=0
 
 while IFS='' read -rd '' srcPath; do
+  if git check-ignore "$srcPath" >/dev/null; then
+    continue
+  fi
+
   # Install Python and shell script bin files without suffix, and switch Python
   # scripts from importable snake case to ergonomic kebab case.
   if [[ "$srcPath" =~ ^\./bin/[a-z0-9_-]+\.(py|sh)$ ]]; then
