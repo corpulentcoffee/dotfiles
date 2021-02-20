@@ -2,13 +2,12 @@
 
 from argparse import ArgumentParser
 from os import getenv
-from typing import List, Optional, Tuple
+from typing import Iterator, List, Optional, Tuple
 
 from boto3 import Session
 
 Retention = Optional[int]
 GroupRetention = Tuple[str, Retention]
-GroupRetentions = List[GroupRetention]
 
 
 def main():
@@ -145,8 +144,8 @@ def run_check(
             )
 
 
-def get_groups(logs, prefix: str) -> GroupRetentions:
-    def page(next_token=None) -> Tuple[GroupRetentions, Optional[str]]:
+def get_groups(logs, prefix: str) -> Iterator[GroupRetention]:
+    def page(next_token=None) -> Tuple[List[GroupRetention], Optional[str]]:
         response = logs.describe_log_groups(
             **dict(logGroupNamePrefix=prefix) if prefix else {},
             **dict(nextToken=next_token) if next_token else {},
