@@ -2,7 +2,7 @@
 
 from collections import namedtuple
 from os import getcwd
-from typing import List, Optional
+from typing import Any, Callable, List, Optional
 
 LINTER_NAME = "github/super-linter"  # both GitHub Action and Docker image name
 DEFAULT_VERSION = "latest"
@@ -12,8 +12,9 @@ Setup = namedtuple("SuperLinterSetup", ["path", "job", "step", "img", "env"])
 
 
 def main():
-    args = get_parser().parse_args()
-    setups = get_superlinter_setups(args.workflow_file)
+    parser = get_parser()
+    args = parser.parse_args()
+    setups = get_superlinter_setups(args.workflow_file, parser.error)
     setup = choose_superlinter_setup(setups)
     run_docker_container(setup, args.codebase_path, args.dry_run)
 
@@ -65,7 +66,7 @@ def get_parser():
     return parser
 
 
-def get_superlinter_setups(workflow_path):
+def get_superlinter_setups(workflow_path: str, error: Callable[[str], Any]):
     from yaml import Loader, load
 
     setups: List[Setup] = []
@@ -79,7 +80,7 @@ def get_superlinter_setups(workflow_path):
                         setups.append(setup)
 
     if workflow_path and not setups:
-        raise ValueError(f"{workflow_path} does not use Super-Linter.")
+        error(f"{workflow_path} does not use Super-Linter.")
 
     return setups
 
