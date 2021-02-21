@@ -15,6 +15,10 @@
     extension; additionally, Python scripts are symlinked in kebab case (which
     is easier to type) rather than the in-repoistory snake case (which is
     `import`able)
+- some items assume the presence of other things (e.g. a script might assume
+  that certain `.gitconfig` aliases are configured or that another script can be
+  called using its installed name), so partial installs might not work without
+  also handling dependencies
 
 ## References
 
