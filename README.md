@@ -2,6 +2,7 @@
 
 ## Usage notes
 
+- assumes a GNU/Linux-style userland
 - [`home/`](home) contains files to be installed into the user home directory,
   keeping those files separate from things needed to maintain and use the
   repository; thus, [`.vscode/`](.vscode) contains Visual Studio Code
@@ -15,6 +16,10 @@
     extension; additionally, Python scripts are symlinked in kebab case (which
     is easier to type) rather than the in-repoistory snake case (which is
     `import`able)
+- some items assume the presence of other things (e.g. a script might assume
+  that certain `.gitconfig` aliases are configured or that another script can be
+  called using its installed name), so partial installs might not work without
+  also handling dependencies
 
 ## References
 
