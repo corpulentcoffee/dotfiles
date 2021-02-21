@@ -20,6 +20,7 @@ def main():
 
 def get_parser():
     from argparse import ArgumentParser
+    from os.path import abspath, isdir
 
     parser = ArgumentParser(
         description="Run GitHub's Super-Linter locally using Docker.",
@@ -29,6 +30,13 @@ def get_parser():
             for more information.
         """,
     )
+
+    def directory_path(value: str) -> str:
+        value = abspath(value)
+        if not isdir(value):
+            parser.error(f"{value} is not a directory")
+        return value
+
     parser.add_argument(
         "codebase_path",
         help=f"""
@@ -37,6 +45,7 @@ def get_parser():
         """,
         nargs="?",
         default=getcwd(),
+        type=directory_path,
     )
     parser.add_argument(
         "--workflow-file",
@@ -162,13 +171,11 @@ def run_docker_container(
     codebase_path: str,
     dry_run: bool,
 ):
-    from os.path import abspath
     from shlex import quote
     from subprocess import run
 
     args = ["docker", "run", "--rm", "--env", "RUN_LOCAL=true"]
 
-    codebase_path = abspath(codebase_path)
     print(f"Mounting {codebase_path} as {CODEBASE_MOUNT} in container.")
     args.extend(["--volume", f"{codebase_path}:{CODEBASE_MOUNT}"])
 
