@@ -2,6 +2,7 @@
 
 ## Usage notes
 
+- assumes a GNU/Linux-style userland
 - [`home/`](home) contains files to be installed into the user home directory,
   keeping those files separate from things needed to maintain and use the
   repository; thus, [`.vscode/`](.vscode) contains Visual Studio Code
