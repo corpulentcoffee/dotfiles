@@ -4,10 +4,11 @@ from collections import namedtuple
 from os import getcwd
 from typing import List, Optional
 
-DOCKER_IMAGE_NAME = "github/super-linter:latest"
+LINTER_NAME = "github/super-linter"  # both GitHub Action and Docker image name
+DEFAULT_VERSION = "latest"
 CODEBASE_MOUNT = "/tmp/lint"
 
-Setup = namedtuple("SuperLinterSetup", ["path", "job_id", "step_num", "env"])
+Setup = namedtuple("SuperLinterSetup", ["path", "job", "step", "img", "env"])
 
 
 def main():
@@ -23,7 +24,7 @@ def get_parser():
     parser = ArgumentParser(
         description="Run GitHub's Super-Linter locally using Docker.",
         epilog=f"""
-            {DOCKER_IMAGE_NAME} will be pulled and ran. See
+            {LINTER_NAME} will be pulled and ran. See
             <https://github.com/github/super-linter/blob/master/docs/run-linter-locally.md>
             for more information.
         """,
@@ -40,8 +41,9 @@ def get_parser():
         "--workflow-file",
         help="""
             path to the YAML file defining your Super-Linter job so that the
-            Docker container can be started with similar environment variables
-            as the real job, or omit this to try to auto-detect your workflow
+            Docker container can be started with the same version and similar
+            environment variables as the real job; omit this to try to
+            auto-detect your workflow
         """,
     )
     parser.add_argument(
@@ -61,19 +63,14 @@ def get_superlinter_setups(workflow_path):
         with open(path) as input:
             for job_id, job_spec in load(input, Loader=Loader)["jobs"].items():
                 for step_num, step_spec in enumerate(job_spec["steps"], 1):
-                    try:
-                        if step_spec["uses"].startswith("github/super-linter"):
-                            env = get_env_without_expressions(step_spec["env"])
-                            if env:
-                                setup = Setup(str(path), job_id, step_num, env)
-                                setups.append(setup)
-                    except KeyError:
-                        pass
+                    if img := get_docker_container_image_version(step_spec):
+                        env = get_env_without_expressions(step_spec)
+                        setup = Setup(str(path), job_id, step_num, img, env)
+                        setups.append(setup)
     return setups
 
 
 def get_workflow_paths():
-
     from pathlib import Path
 
     current = Path(getcwd())
@@ -90,10 +87,30 @@ def get_workflow_paths():
     )
 
 
-def get_env_without_expressions(env: dict) -> dict:
-    return {
-        key: value for key, value in env.items() if "${{" not in str(value)
-    }
+def get_docker_container_image_version(step_spec: dict) -> Optional[str]:
+    try:
+        uses = step_spec["uses"]
+    except KeyError:
+        pass
+    else:
+        return (
+            DEFAULT_VERSION
+            if uses == LINTER_NAME
+            else uses.split("@", 1)[1]
+            if uses.startswith(f"{LINTER_NAME}@")
+            else None
+        )
+
+
+def get_env_without_expressions(step_spec: dict) -> dict:
+    try:
+        env = step_spec["env"]
+    except KeyError:
+        return {}
+    else:
+        return {
+            key: value for key, value in env.items() if "${{" not in str(value)
+        }
 
 
 def choose_superlinter_setup(setups: List[Setup]) -> Optional[Setup]:
@@ -116,7 +133,7 @@ def choose_superlinter_setup(setups: List[Setup]) -> Optional[Setup]:
     for number, setup in enumerate(setups, 1):
         print()
         print(f"  #{number:<3}  {setup.path}")
-        print(f'        step {setup.step_num} of "{setup.job_id}" job')
+        print(f'        step {setup.step} of "{setup.job}" job on {setup.img}')
         for key, value in setup.env.items():
             print(f"        {key}={value}")
     print()
@@ -146,20 +163,21 @@ def run_docker_container(
 
     args = ["docker", "run", "--rm", "--env", "RUN_LOCAL=true"]
 
-    if setup:
-        print(
-            f"Taking environment from step {setup.step_num} in the "
-            f'"{setup.job_id}" job as specified by {setup.path}.'
-        )
-        for key, value in setup.env.items():
-            args.extend(["--env", f"{key}={get_env_value_as_str(value)}"])
-
     codebase_path = abspath(codebase_path)
     print(f"Mounting {codebase_path} as {CODEBASE_MOUNT} in container.")
     args.extend(["--volume", f"{codebase_path}:{CODEBASE_MOUNT}"])
 
-    print(f"Using {DOCKER_IMAGE_NAME} as container image.")
-    args.append(DOCKER_IMAGE_NAME)
+    if setup:
+        print(
+            f"Taking environment and container version from step {setup.step} "
+            f'in the "{setup.job}" job as specified by {setup.path}.'
+        )
+        for key, value in setup.env.items():
+            args.extend(["--env", f"{key}={get_env_value_as_str(value)}"])
+        args.append(f"{LINTER_NAME}:{setup.img}")
+    else:
+        print(f"Using {DEFAULT_VERSION} Super-Linter without any environment.")
+        args.append(f"{LINTER_NAME}:{DEFAULT_VERSION}")
 
     print()
     print("Would invoke Docker with:" if dry_run else "Starting Docker...")
