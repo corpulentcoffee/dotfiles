@@ -5,6 +5,9 @@
 	up = fetch --all --prune --tags --verbose
 	whoami = ! git var -l | grep '^GIT_.*_IDENT'
 
+[core]
+; n.b. Some options default to paths in `.config/git/` (like `excludesFile`).
+
 [rebase]
 	autoSquash = true
 	autoStash = true
