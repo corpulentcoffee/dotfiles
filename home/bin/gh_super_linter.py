@@ -30,11 +30,12 @@ def get_parser():
         """,
     )
     parser.add_argument(
-        "--codebase-path",
+        "codebase_path",
         help=f"""
             this path will mounted as {CODEBASE_MOUNT} in the Docker container;
             defaults to the present working directory, %(default)s
         """,
+        nargs="?",
         default=getcwd(),
     )
     parser.add_argument(
