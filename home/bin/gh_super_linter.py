@@ -67,6 +67,10 @@ def get_superlinter_setups(workflow_path):
                         env = get_env_without_expressions(step_spec)
                         setup = Setup(str(path), job_id, step_num, img, env)
                         setups.append(setup)
+
+    if workflow_path and not setups:
+        raise ValueError(f"{workflow_path} does not use Super-Linter.")
+
     return setups
 
 
