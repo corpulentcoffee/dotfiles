@@ -1,18 +1,28 @@
 #!/usr/bin/env python3
 
 from os import environ
-from typing import List, TypedDict, cast
+from typing import Dict, List, TypedDict, cast
 
 
 def main():
-    args = get_parser().parse_args()
+    from time import time
 
-    credentials = get_credentials(
-        profile=args.profile,
-        role_arn=args.role_arn,
-        session_name=args.session_name,
-        serial_number=args.serial_number,
-    )
+    parser = get_parser()
+    args = parser.parse_args()
+    credential_cache = get_credential_cache(prog=parser.prog)
+    cache_key = get_cache_key(args.role_arn)
+    need_credentials_until = time() + 60 * args.lifespan_in_minutes
+
+    try:
+        credentials = credential_cache[cache_key]
+        assert need_credentials_until <= credentials["Expiration"]
+    except (KeyError, AssertionError):
+        credential_cache[cache_key] = credentials = get_credentials(
+            profile=args.profile,
+            role_arn=args.role_arn,
+            session_name=args.session_name,
+            serial_number=args.serial_number,
+        )
 
     do_spawn(
         access_key_id=credentials["AccessKeyId"],
@@ -67,6 +77,15 @@ def get_parser():
         """,
     )
     parser.add_argument(
+        "--lifespan-in-minutes",
+        type=int,
+        default=5,
+        help="""
+            require that at least this many minutes are still remaining on the
+            credentials before running your command
+        """,
+    )
+    parser.add_argument(
         "command",
         nargs="*",
         help="""
@@ -85,6 +104,38 @@ class StsCredentials(TypedDict):
     SecretAccessKey: str
     SessionToken: str
     Expiration: int
+
+
+def get_credential_cache(prog: str):
+    """
+    Returns a dict-like object for caching credentials on-disk. This is
+    similar to how the AWS CLI does things with `~/.aws/cli/cache/`, but
+    unfortunately stored at a different location such that neither tool
+    benefits from the other's cache.
+
+    There's another way to cache credentials by overriding the `cache`
+    attribute on the `assume-role` provider of the `credential_provider`
+    component (see <https://github.com/boto/botocore/pull/1157>), but
+    that cannot be leveraged here because
+
+    - we are the ones doing the call to `assume_role()` rather than it
+      being called for us by another AWS service client, and
+    - we want to be able to inspect the `Expiration` value of what we
+      have cached to make sure the caller has the requisite time left.
+    """
+
+    from appdirs import user_cache_dir
+    from botocore.credentials import JSONFileCache
+
+    our_cache_dir = user_cache_dir(appname=prog)  # e.g. ~/.cache/aws-as-role/
+    credential_cache = JSONFileCache(working_dir=our_cache_dir)
+    return cast(Dict[str, StsCredentials], credential_cache)
+
+
+def get_cache_key(role_arn: str):
+    from hashlib import sha1
+
+    return sha1(role_arn.encode("utf-8")).hexdigest()
 
 
 def get_credentials(
