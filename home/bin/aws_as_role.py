@@ -3,6 +3,8 @@
 from os import environ
 from typing import Dict, List, TypedDict, cast
 
+STS_DURATION_SECONDS = 3600
+
 
 def main():
     from time import time
@@ -11,7 +13,7 @@ def main():
     args = parser.parse_args()
     credential_cache = get_credential_cache(prog=parser.prog)
     cache_key = get_cache_key(args.role_arn)
-    need_credentials_until = time() + 60 * args.lifespan_in_minutes
+    need_credentials_until = time() + args.duration_seconds
 
     try:
         credentials = credential_cache[cache_key]
@@ -22,6 +24,7 @@ def main():
             role_arn=args.role_arn,
             session_name=args.session_name,
             serial_number=args.serial_number,
+            duration_seconds=max(args.duration_seconds, STS_DURATION_SECONDS),
         )
 
     do_spawn(
@@ -77,12 +80,15 @@ def get_parser():
         """,
     )
     parser.add_argument(
-        "--lifespan-in-minutes",
+        "--duration-seconds",
         type=int,
-        default=5,
-        help="""
-            require that at least this many minutes are still remaining on the
-            credentials before running your command
+        default=600,
+        help=f"""
+            require that at least this many seconds are still remaining on the
+            credentials before running your command (default is %(default)s
+            seconds); additionally, if the value given here is greater than
+            {STS_DURATION_SECONDS}, it will be used to request a longer
+            lifespan on the credentials from STS
         """,
     )
     parser.add_argument(
@@ -143,6 +149,7 @@ def get_credentials(
     role_arn: str,
     session_name: str,
     serial_number: str,
+    duration_seconds: int,
 ):
     from getpass import getpass
 
@@ -158,6 +165,7 @@ def get_credentials(
             RoleSessionName=session_name,
             SerialNumber=serial_number,
             TokenCode=getpass(f"Enter MFA code for {serial_number}: "),
+            DurationSeconds=duration_seconds,
         )
         if serial_number
         else assume_role(RoleArn=role_arn, RoleSessionName=session_name)
