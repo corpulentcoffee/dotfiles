@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+
+from datetime import datetime
+from os import environ
+from typing import List, TypedDict
+
+
+def main():
+    args = get_parser().parse_args()
+
+    credentials = get_credentials(
+        profile=args.profile,
+        role_arn=args.role_arn,
+        session_name=args.session_name,
+        serial_number=args.serial_number,
+    )
+
+    do_spawn(
+        access_key_id=credentials["AccessKeyId"],
+        secret_access_key=credentials["SecretAccessKey"],
+        session_token=credentials["SessionToken"],
+        command=args.command,
+    )
+
+
+def get_parser():
+    from argparse import ArgumentParser
+
+    parser = ArgumentParser(
+        description="Run a command after assuming an IAM role.",
+        epilog="""
+            Your own credentials must have authorization to obtain temporary
+            tokens from the AWS Security Token Service (STS) for the given
+            role.
+        """,
+    )
+    parser.add_argument(
+        "--profile",
+        help="""
+            use named AWS profile (e.g. "development") for requesting the token
+            from STS or omit to use environment variables
+        """,
+    )
+    parser.add_argument(
+        "--role-arn",
+        help="""
+            full ARN of the role you need to assume, e.g.
+            arn:aws:iam::123456789012:role/OrganizationAccountAccessRole
+        """,
+        required=True,
+    )
+    parser.add_argument(
+        "--session-name",
+        help="""
+            give STS a custom session name when assuming the role, e.g. if you
+            need to conform to an IAM policy using an "sts:RoleSessionName"
+            condition or want to see it in CloudTrail logs; defaults to
+            "%(default)s"
+        """,
+        default=parser.prog,
+    )
+    parser.add_argument(
+        "--serial-number",
+        help="""
+            if using multi-factor authentication, the serial number for a
+            hardware device or the full ARN for a TOTP-based registration, e.g.
+            arn:aws:iam::123456789012:mfa/user123
+        """,
+    )
+    parser.add_argument(
+        "command",
+        nargs="*",
+        help="""
+            run this command with temporary credentials obtained from STS after
+            assuming the role; if unspecified, defaults to your shell, which is
+            currently %(default)s
+        """,
+        default=[environ["SHELL"]],
+    )
+
+    return parser
+
+
+class StsCredentials(TypedDict):
+    AccessKeyId: str
+    SecretAccessKey: str
+    SessionToken: str
+    Expiration: datetime
+
+
+def get_credentials(
+    profile: str,
+    role_arn: str,
+    session_name: str,
+    serial_number: str,
+) -> StsCredentials:
+    from getpass import getpass
+
+    from boto3 import Session
+
+    session = Session(profile_name=profile)
+    sts = session.client("sts")
+    assume_role = sts.assume_role
+
+    response = (
+        assume_role(
+            RoleArn=role_arn,
+            RoleSessionName=session_name,
+            SerialNumber=serial_number,
+            TokenCode=getpass(f"Enter MFA code for {serial_number}: "),
+        )
+        if serial_number
+        else assume_role(RoleArn=role_arn, RoleSessionName=session_name)
+    )
+
+    return response["Credentials"]
+
+
+def do_spawn(
+    access_key_id: str,
+    secret_access_key: str,
+    session_token: str,
+    command: List[str],
+):
+    from subprocess import run
+
+    # copy current set of environment variables, but clear AWS_PROFILE if set
+    # so that the subprocess only sees the new credentials.
+    new_environ = dict(environ)
+    try:
+        del new_environ["AWS_PROFILE"]
+    except KeyError:
+        pass
+
+    # configure new credentials into environment
+    new_environ.update(
+        AWS_ACCESS_KEY_ID=access_key_id,
+        AWS_SECRET_ACCESS_KEY=secret_access_key,
+        AWS_SESSION_TOKEN=session_token,
+    )
+
+    run(command, env=new_environ)
+
+
+if __name__ == "__main__":
+    main()
