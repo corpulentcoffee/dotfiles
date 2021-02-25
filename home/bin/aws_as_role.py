@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 
-from datetime import datetime
 from os import environ
-from typing import List, TypedDict
+from typing import List, TypedDict, cast
 
 
 def main():
@@ -85,7 +84,7 @@ class StsCredentials(TypedDict):
     AccessKeyId: str
     SecretAccessKey: str
     SessionToken: str
-    Expiration: datetime
+    Expiration: int
 
 
 def get_credentials(
@@ -93,7 +92,7 @@ def get_credentials(
     role_arn: str,
     session_name: str,
     serial_number: str,
-) -> StsCredentials:
+):
     from getpass import getpass
 
     from boto3 import Session
@@ -113,7 +112,11 @@ def get_credentials(
         else assume_role(RoleArn=role_arn, RoleSessionName=session_name)
     )
 
-    return response["Credentials"]
+    credentials = dict(
+        response["Credentials"],
+        Expiration=response["Credentials"]["Expiration"].timestamp(),
+    )
+    return cast(StsCredentials, credentials)
 
 
 def do_spawn(
