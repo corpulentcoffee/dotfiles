@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
-      - uses: github/super-linter@v3.14.5
+      - uses: github/super-linter@v3.15.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
 
