@@ -1,8 +1,23 @@
 [alias]
-	graph = ! log git-graph
+; Executables on the user's path named like `git-xxx` are automatically made
+; available as `git xxx`, but done so as if the subcommand were a built-in one.
+; Built-in commands are not allowed to be `alias`ed over, limiting user ability
+; to override alias functionality at a repository level (`git config --local`
+; stored in `.git/config`). As such, alias helpers should be named differently,
+; like `gitalias-xxx` as done here, *or* they should not be accessible on the
+; user's path.
+;
+; Any arguments the user passes after an alias is appended after expansion.
+; Using the null command (see `help :` in bash) here has no effect when running
+; the expanded command but provides a hint during bash completion what kind of
+; arguments the alias is capable of accepting. For more information and/or
+; additional examples, see:
+; https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
+
+	graph = !: git log && gitalias-graph
 	staged = diff --staged
-	sync = ! commit git-sync
-	up = fetch --all --prune --tags --verbose
+	sync = !: git commit && gitalias-sync
+	up = fetch --all --prune --tags
 	whoami = ! git var -l | grep '^GIT_.*_IDENT'
 
 [core]

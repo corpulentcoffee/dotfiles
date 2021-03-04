@@ -7,6 +7,13 @@ shopt -s inherit_errexit
 # Inspired by <https://gitjournal.io/support/#auto-syncing-from-the-desktop>,
 # but more conservative, with greater opportunities to confirm or bail out of
 # what is happening.
+#
+# Arguments to this script will be forwarded along after `git commit --patch`,
+# e.g. `git sync -m <msg>` would become `git commit --patch -m <msg>`. For bash
+# completion to work, `git sync` should be registered as a `commit`-like script:
+#
+# [alias]
+# 	sync = !: git commit && gitalias-sync
 
 function msg() {
   echo
@@ -28,8 +35,6 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
     fi
   done
 
-  # Additional arguments can optionally be passed here (e.g.`-m <msg>`, path),
-  # so completion for this script can follow `git commit` (see `.gitconfig`).
   # Note that `git commit` returns a non-zero status if nothing is commited.
   git commit --patch "$@" || true
 
@@ -45,7 +50,12 @@ git push --verbose
 
 # Special but not totally uncommon case: secondary remote for the trunk branch.
 # This sort of thing could alternatively be handled by a local in-repo alias
-# that overrides the global `alias.sync` configuration.
+# that overrides the global `alias.sync` configuration. However, one would have
+# to be mindful of argument handling (which are appended after alias expansion),
+# like by wrapping it with an immediately-called shell function:
+#
+# [alias]
+# 	sync = "!f() { : git commit && gitalias-sync \"$@\" && git push backups master; }; f"
 readonly backupRemote=backups
 if [[ $repoBranch =~ ^refs/heads/ma(in|ster)$ ]] &&
   [ -n "$(git branch --remotes --list "$backupRemote/${repoBranch##*/}")" ]; then
