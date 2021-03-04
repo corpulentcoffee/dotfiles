@@ -20,7 +20,10 @@
   "terminal.integrated.allowChords": false,
 
   "[python]": {
-    "editor.rulers": [79],
+    "editor.rulers": [
+      /** documentation */ { "column": 72, "color": "#333" },
+      /** regular lines */ 79
+    ],
     "editor.tabSize": 4
   }
 }
