@@ -17,7 +17,7 @@
 	graph = !: git log && gitalias-graph
 	staged = diff --staged
 	sync = !: git commit && gitalias-sync
-	up = fetch --all --prune --tags --verbose
+	up = fetch --all --prune --tags
 	whoami = ! git var -l | grep '^GIT_.*_IDENT'
 
 [core]
