@@ -17,6 +17,8 @@
   "telemetry.enableCrashReporter": false,
   "telemetry.enableTelemetry": false,
 
+  "terminal.integrated.allowChords": false,
+
   "[python]": {
     "editor.rulers": [79],
     "editor.tabSize": 4
