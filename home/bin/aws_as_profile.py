@@ -62,7 +62,9 @@ def get_parser_help() -> Tuple[str, str]:
     from textwrap import dedent, fill
 
     width = get_terminal_size().columns - 2  # same as argparse HelpFormatter
-    format = lambda text: fill(dedent(text).strip(), width)
+
+    def format(text):
+        return fill(dedent(text).strip(), width)
 
     description = f"""
         Use {AS_ROLE} to run a command using the role_arn and source_profile
@@ -73,7 +75,7 @@ def get_parser_help() -> Tuple[str, str]:
         You must have an {PROFILE_PATH} similar to this:
     """
 
-    epilog_example = f"""
+    epilog_example = """
         [organization]
         aws_access_key_id = XXX
         aws_secret_access_key = XXX
@@ -84,7 +86,7 @@ def get_parser_help() -> Tuple[str, str]:
         mfa_serial = arn:aws:iam::1234567890:mfa/username
     """
 
-    epilog_explanation = f"""
+    epilog_explanation = """
         Here, the "organization" profile has credentials with permission to
         assume the role specified by the destination "production" profile.
 
