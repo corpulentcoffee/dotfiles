@@ -8,7 +8,11 @@ PROFILE_PATH = "~/.aws/credentials"
 
 def main():
     args = get_parser().parse_args()
-    print(args)
+    profile_config = get_profile_config()
+    destination_config = profile_config[args.profile]
+    destination_role_arn = destination_config["role_arn"]
+    source_profile_name = destination_config["source_profile"]
+    print(destination_role_arn, "via", source_profile_name)
 
 
 def get_parser():
@@ -91,6 +95,16 @@ def get_parser_help() -> Tuple[str, str]:
     ]
 
     return format(description), "\n\n".join(epilog_blocks)
+
+
+def get_profile_config():
+    from configparser import ConfigParser
+    from os.path import expanduser
+
+    profile_path = expanduser(PROFILE_PATH)
+    profile_config = ConfigParser()
+    profile_config.read(profile_path)
+    return profile_config
 
 
 if __name__ == "__main__":
