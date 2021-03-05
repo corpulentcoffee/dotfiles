@@ -18,7 +18,7 @@ def main():
         duration_seconds=args.duration_seconds,
         command=args.command,
     )
-    print(as_role_command)
+    do_spawn(as_role_command)
 
 
 def get_parser():
@@ -135,6 +135,15 @@ def get_as_role_command(
         as_role_command.extend(["--", *command])
 
     return as_role_command
+
+
+def do_spawn(command: List[str]):
+    from shlex import quote
+    from subprocess import run
+    from sys import stderr
+
+    print(*map(quote, command), file=stderr)  # inform user what we're doing
+    run(command)
 
 
 if __name__ == "__main__":
