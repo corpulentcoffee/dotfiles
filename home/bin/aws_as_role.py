@@ -38,6 +38,7 @@ def main():
 def get_parser():
     from argparse import ArgumentParser
 
+    # if changing this interface, review aws-as-profile's usage of aws-as-role
     parser = ArgumentParser(
         description="Run a command after assuming an IAM role.",
         epilog="""

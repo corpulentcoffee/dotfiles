@@ -37,12 +37,14 @@ def get_parser():
         source_profile
     """.strip()
     try:
+        default_profile = environ["AWS_PROFILE"].strip()
+        assert len(default_profile) > 0
         parser.add_argument(
             "--profile",
-            default=environ["AWS_PROFILE"],
-            help=f"{profile_help}; defaults to AWS_PROFILE (%(default)s)",
+            default=default_profile,
+            help=f'{profile_help}; defaults to your AWS_PROFILE "%(default)s"',
         )
-    except KeyError:
+    except (KeyError, AssertionError):
         parser.add_argument(
             "--profile",
             required=True,
@@ -59,7 +61,7 @@ def get_parser():
 
 def get_parser_help() -> Tuple[str, str]:
     from shutil import get_terminal_size
-    from textwrap import dedent, fill
+    from textwrap import dedent, fill, indent
 
     width = get_terminal_size().columns - 2  # same as argparse HelpFormatter
 
@@ -67,8 +69,11 @@ def get_parser_help() -> Tuple[str, str]:
         return fill(dedent(text).strip(), width)
 
     description = f"""
-        Use {AS_ROLE} to run a command using the role_arn and source_profile
-        specified by an {PROFILE_PATH} profile.
+        Use {AS_ROLE} to run a command after assuming a destination profile's
+        role_arn via its source_profile as specified by {PROFILE_PATH}. This
+        can be helpful for tools that don't implement cross-profile roles but
+        do understand AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_SESSION_TOKEN
+        environment variables.
     """
 
     epilog_intro = f"""
@@ -98,7 +103,7 @@ def get_parser_help() -> Tuple[str, str]:
 
     epilog_blocks = [
         format(epilog_intro),
-        dedent(epilog_example),
+        indent(dedent(epilog_example), prefix="  "),
         format(epilog_explanation),
     ]
 
@@ -145,6 +150,7 @@ def do_spawn(command: List[str]):
     from sys import stderr
 
     print(*map(quote, command), file=stderr)  # inform user what we're doing
+    print(file=stderr)
     run(command)
 
 
