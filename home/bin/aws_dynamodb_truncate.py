@@ -1,22 +1,18 @@
 #!/usr/bin/env python3
 
-from typing import Dict, Iterable, List, cast
+from typing import Any, Dict, Iterable, List, cast
 
 from boto3 import Session
 
-DynamoValue = Dict[str, str]  # e.g. {"N": "12345"}
-DynamoItem = Dict[str, DynamoValue]  # e.g. {"id": {"N": "12345"}}
+DynamoItemKeys = Dict[str, Any]  # e.g. {"hashKey": 1234, "rangeKey": 5678}
 
 
 def main() -> int:
     args = get_parser().parse_args()
     session = Session(profile_name=args.profile, region_name=args.region)
-
-    # see https://github.com/boto/boto3/issues/2039
-    client = session.client("dynamodb")
     table = session.resource("dynamodb").Table(args.table_name)
+    batches = in_batches(get_items(session, table))
 
-    batches = in_batches(get_items(client, table))
     try:
         first_batch = next(batches)
     except StopIteration:
@@ -26,9 +22,10 @@ def main() -> int:
     if get_confirmation(table.name, table.item_count, first_batch) is not True:
         return 1
 
-    delete_items(client, table.name, first_batch)
-    for successive_batch in batches:
-        delete_items(client, table.name, successive_batch)
+    with table.batch_writer() as writer:  # also handles UnprocessedItems
+        delete_items(writer, first_batch)
+        for successive_batch in batches:
+            delete_items(writer, successive_batch)
 
     return 0
 
@@ -64,7 +61,7 @@ def get_parser():
     return parser
 
 
-def get_items(client, table):
+def get_items(session: Session, table):
     keys = [definition["AttributeName"] for definition in table.key_schema]
     enumerated = list(enumerate(keys))
     params = dict(
@@ -72,14 +69,20 @@ def get_items(client, table):
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
     )
+
+    # We use a regular DynamoDB client here because the Table resource doesn't
+    # do paging; see https://github.com/boto/boto3/issues/2039
+    client = session.client("dynamodb")
     paginator = client.get_paginator("scan")  # handles LastEvaluatedKey
 
     for result in paginator.paginate(**params):
-        yield from cast(List[DynamoItem], result["Items"])
+        for item in result["Items"]:
+            item_keys = {key: next(iter(item[key].values())) for key in keys}
+            yield cast(DynamoItemKeys, item_keys)
 
 
-def in_batches(sequence: Iterable[DynamoItem], count: int = 25):
-    accumulated: List[DynamoItem] = []
+def in_batches(sequence: Iterable[DynamoItemKeys], count: int = 25):
+    accumulated: List[DynamoItemKeys] = []
 
     for item in sequence:
         accumulated.append(item)
@@ -94,7 +97,7 @@ def in_batches(sequence: Iterable[DynamoItem], count: int = 25):
 def get_confirmation(
     table_name: str,
     item_count: int,
-    sample: List[DynamoItem],
+    sample: List[DynamoItemKeys],
 ) -> bool:
     from textwrap import dedent
 
@@ -122,44 +125,15 @@ def get_confirmation(
     return input(f"{dedent(prompt).strip()} ").lower().startswith("y")
 
 
-def delete_items(client, table_name: str, items: List[DynamoItem]):
+def delete_items(writer, items: List[DynamoItemKeys]):
     print("deleting:", get_formatted_items(items))
-
-    request_items = {
-        table_name: [{"DeleteRequest": {"Key": item}} for item in items]
-    }
-    backoff_time = 1
-
-    while request_items:
-        response = client.batch_write_item(RequestItems=request_items)
-
-        if response.get("UnprocessedItems"):
-            from time import sleep
-
-            request_items = cast(dict, response["UnprocessedItems"])
-            print(
-                f"Retrying {len(request_items)}",
-                "item" if len(request_items) == 1 else "items",
-                f"after a {backoff_time}-second delay",
-            )
-
-            sleep(backoff_time)
-            backoff_time *= 2
-
-        else:
-            request_items = None
+    for item in items:
+        print(item)
+        writer.delete_item(Key=item)
 
 
-def get_formatted_items(items: List[DynamoItem]) -> str:
-    return ", ".join(get_formatted_item(item) for item in items)
-
-
-def get_formatted_item(item: DynamoItem) -> str:
-    return " w/ ".join(
-        f'{key}="{value_str}"'
-        for key, value in item.items()
-        for value_str in value.values()
-    )
+def get_formatted_items(items: List[DynamoItemKeys]) -> str:
+    return ", ".join(repr(item) for item in items)
 
 
 if __name__ == "__main__":
