@@ -12,7 +12,14 @@ def main():
     table_name = args.table_name
     item_count, keys = get_table_info(client, table_name)
     batches = in_batches(get_items(client, table_name, keys))
-    print(item_count, next(batches))
+
+    try:
+        first_batch = next(batches)
+    except StopIteration:
+        print(f"{table_name} is already empty.")
+        return
+
+    print(item_count, first_batch)
 
 
 def get_parser():
