@@ -118,6 +118,11 @@ def get_confirmation(
         if item_count > 0
         else "An estimate for the item count of this table is not available."
     )
+    if item_count >= 100_000:
+        estimate += (
+            " For a table of this size, consider deleting and recreating it "
+            "as a faster and cheaper alternative."
+        )
 
     prompt = f"""
         All items from {table_name} will be deleted.
