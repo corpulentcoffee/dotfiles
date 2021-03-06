@@ -2,29 +2,35 @@
 
 from typing import Dict, Iterable, List, Tuple, cast
 
+from boto3 import Session
+
 DynamoValue = Dict[str, str]  # e.g. {"N": "12345"}
 DynamoItem = Dict[str, DynamoValue]  # e.g. {"id": {"N": "12345"}}
 
 
 def main() -> int:
     args = get_parser().parse_args()
-    client = get_dynamodb_client(args.profile, args.region)
-    table_name = args.table_name
-    item_count, keys = get_table_info(client, table_name)
-    batches = in_batches(get_items(client, table_name, keys))
+    session = Session(profile_name=args.profile, region_name=args.region)
+
+    # see https://github.com/boto/boto3/issues/2039
+    client = session.client("dynamodb")
+    table = session.resource("dynamodb").Table(args.table_name)
+
+    item_count, keys = get_table_info(client, table.name)
+    batches = in_batches(get_items(client, table.name, keys))
 
     try:
         first_batch = next(batches)
     except StopIteration:
-        print(f"{table_name} is already empty.")
+        print(f"{table.name} is already empty.")
         return 0
 
-    if get_confirmation(table_name, item_count, first_batch) is not True:
+    if get_confirmation(table.name, item_count, first_batch) is not True:
         return 1
 
-    delete_items(client, table_name, first_batch)
+    delete_items(client, table.name, first_batch)
     for successive_batch in batches:
-        delete_items(client, table_name, successive_batch)
+        delete_items(client, table.name, successive_batch)
 
     return 0
 
@@ -58,13 +64,6 @@ def get_parser():
     )
 
     return parser
-
-
-def get_dynamodb_client(profile: str, region: str):
-    from boto3 import Session
-
-    session = Session(profile_name=profile, region_name=region)
-    return session.client("dynamodb")
 
 
 def get_table_info(client, table_name: str) -> Tuple[int, List[str]]:
