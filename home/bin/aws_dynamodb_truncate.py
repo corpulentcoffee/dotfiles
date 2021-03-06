@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import Dict, List, Tuple, cast
+from typing import Dict, Iterable, List, Tuple, cast
 
 DynamoValue = Dict[str, str]  # e.g. {"N": "12345"}
 DynamoItem = Dict[str, DynamoValue]  # e.g. {"id": {"N": "12345"}}
@@ -11,8 +11,8 @@ def main():
     client = get_dynamodb_client(args.profile, args.region)
     table_name = args.table_name
     item_count, keys = get_table_info(client, table_name)
-    items = get_items(client, table_name, keys)
-    print(item_count, next(items))
+    batches = in_batches(get_items(client, table_name, keys))
+    print(item_count, next(batches))
 
 
 def get_parser():
@@ -77,6 +77,19 @@ def get_items(client, table_name: str, attrs: List[str]):
             params["ExclusiveStartKey"] = result["LastEvaluatedKey"]
         else:
             params = None
+
+
+def in_batches(sequence: Iterable[DynamoItem], count: int = 25):
+    accumulated: List[DynamoItem] = []
+
+    for item in sequence:
+        accumulated.append(item)
+        if len(accumulated) == count:
+            yield accumulated
+            accumulated = []
+
+    if accumulated:
+        yield accumulated
 
 
 if __name__ == "__main__":
