@@ -33,10 +33,13 @@ def get_parser():
     from argparse import ArgumentParser
 
     parser = ArgumentParser(
-        description="Delete all items in a DynamoDB table.",
+        description="""
+            Clear a DynamoDB table by scanning for its item keys and then batch
+            deleting all items found.
+        """,
         epilog="""
-            If your table contains many items, consider deleting the table and
-            creating it again as a cheaper/faster alternative.
+            If your table contains many items, consider deleting the table as
+            whole and creating it again as a cheaper/faster alternative.
         """,
     )
     parser.add_argument(
