@@ -72,15 +72,10 @@ def get_items(client, table):
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
     )
+    paginator = client.get_paginator("scan")  # handles LastEvaluatedKey
 
-    while params:
-        result = client.scan(**params)
+    for result in paginator.paginate(**params):
         yield from cast(List[DynamoItem], result["Items"])
-
-        if result.get("LastEvaluatedKey"):
-            params["ExclusiveStartKey"] = result["LastEvaluatedKey"]
-        else:
-            params = None
 
 
 def in_batches(sequence: Iterable[DynamoItem], count: int = 25):
