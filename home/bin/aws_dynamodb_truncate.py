@@ -6,7 +6,7 @@ from typing import List, Optional, cast
 def main() -> int:
     args = get_parser().parse_args()
     table = get_table(args.profile, args.region, args.table_name, args.retries)
-    pages = get_item_pages(table, args.scan_size)
+    pages = get_item_pages(table, args.consistent_scan, args.scan_size)
     first_page = next(pages)
 
     if not first_page:
@@ -57,6 +57,15 @@ def get_parser():
         required=True,
     )
     parser.add_argument(
+        "--consistent-scan",
+        help="""
+            set to ensure item scan reflects recently-completed changes to the
+            table; note that this will double the read capacity units consumed
+        """,
+        action="store_true",
+        default=False,
+    )
+    parser.add_argument(
         "--scan-size",
         help="limit number of items read from table at once",
         metavar="COUNT",
@@ -91,13 +100,14 @@ def get_table(
     return dynamodb.Table(table_name)
 
 
-def get_item_pages(table, scan_size: Optional[int]):
+def get_item_pages(table, consistent_scan: bool, scan_size: Optional[int]):
     keys = [definition["AttributeName"] for definition in table.key_schema]
     enumerated = list(enumerate(keys))
     params = dict(
         TableName=table.name,
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
+        ConsistentRead=consistent_scan,
     )
     if scan_size:
         params.update(dict(Limit=scan_size))
