@@ -6,7 +6,7 @@ DynamoValue = Dict[str, str]  # e.g. {"N": "12345"}
 DynamoItem = Dict[str, DynamoValue]  # e.g. {"id": {"N": "12345"}}
 
 
-def main():
+def main() -> int:
     args = get_parser().parse_args()
     client = get_dynamodb_client(args.profile, args.region)
     table_name = args.table_name
@@ -17,9 +17,13 @@ def main():
         first_batch = next(batches)
     except StopIteration:
         print(f"{table_name} is already empty.")
-        return
+        return 0
 
-    print(item_count, first_batch)
+    if get_confirmation(table_name, item_count, first_batch) is not True:
+        return 1
+
+    print("TODO")
+    return 1
 
 
 def get_parser():
@@ -99,5 +103,43 @@ def in_batches(sequence: Iterable[DynamoItem], count: int = 25):
         yield accumulated
 
 
+def get_confirmation(
+    table_name: str,
+    item_count: int,
+    sample: List[DynamoItem],
+) -> bool:
+    from textwrap import dedent
+
+    estimate = (
+        f"About {item_count} items are estimated to be in this table."
+        if item_count > 0
+        else "An estimate for the item count of this table is not available."
+    )
+
+    prompt = f"""
+        All items from {table_name} will be deleted.
+        {estimate}
+
+        This is the first batch of items that would be deleted:
+        {get_formatted_items(sample)}
+
+        Are you sure you want to continue?
+    """
+
+    return input(f"{dedent(prompt).strip()} ").lower().startswith("y")
+
+
+def get_formatted_items(items: List[DynamoItem]) -> str:
+    return ", ".join(get_formatted_item(item) for item in items)
+
+
+def get_formatted_item(item: DynamoItem) -> str:
+    return " w/ ".join(
+        f'{key}="{value_str}"'
+        for key, value in item.items()
+        for value_str in value.values()
+    )
+
+
 if __name__ == "__main__":
-    main()
+    exit(main())
