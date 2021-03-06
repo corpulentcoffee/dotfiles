@@ -13,6 +13,7 @@ def main() -> int:
         print(f"{table.name} is already empty.")
         return 0
     elif get_confirmation(table, first_page[0:10]) is not True:
+        print("Action canceled.")
         return 1
 
     with table.batch_writer() as batch_writer:  # also handles UnprocessedItems
@@ -135,10 +136,11 @@ def get_confirmation(table, sample: List[dict]) -> bool:
         Here's a sample of the first batch of items that would be deleted:
         {get_formatted_items(sample)}
 
-        Are you sure you want to continue?
+        Enter table name to confirm deleting all items:
     """
 
-    return input(f"{dedent(prompt).strip()} ").lower().startswith("y")
+    response = input(f"{dedent(prompt).strip()} ")
+    return response.strip().lower() == table.name.strip().lower()
 
 
 def delete_items(batch_writer, items: List[dict]):
