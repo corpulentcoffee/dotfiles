@@ -12,13 +12,19 @@ def main() -> int:
     if not first_page:
         print(f"{table.name} is already empty.")
         return 0
-    elif get_confirmation(table, first_page) is not True:
+    elif get_confirmation(table, first_page[0:10]) is not True:
         return 1
 
     with table.batch_writer() as batch_writer:  # also handles UnprocessedItems
+        print(f"deleting first {len(first_page)}-item page...")
         delete_items(batch_writer, first_page)
+        print("scanning the remaining items", end="... ")
         for successive_page in pages:
+            print(f"deleting next {len(successive_page)}-item page...")
             delete_items(batch_writer, successive_page)
+            print("looking for additional items", end="... ")
+        print("got everything; finishing up...")
+    print(f"{table.name} should now be empty.")
     return 0
 
 
@@ -100,7 +106,7 @@ def get_confirmation(table, sample: List[dict]) -> bool:
         All items from {table.name} will be deleted.
         {estimate}
 
-        This is the first batch of items that would be deleted:
+        Here's a sample of the first batch of items that would be deleted:
         {get_formatted_items(sample)}
 
         Are you sure you want to continue?
@@ -110,7 +116,6 @@ def get_confirmation(table, sample: List[dict]) -> bool:
 
 
 def delete_items(batch_writer, items: List[dict]):
-    print("deleting:", get_formatted_items(items))
     for item in items:
         batch_writer.delete_item(item)
 
