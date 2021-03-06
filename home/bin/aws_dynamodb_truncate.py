@@ -22,8 +22,11 @@ def main() -> int:
     if get_confirmation(table_name, item_count, first_batch) is not True:
         return 1
 
-    print("TODO")
-    return 1
+    delete_items(client, table_name, first_batch)
+    for successive_batch in batches:
+        delete_items(client, table_name, successive_batch)
+
+    return 0
 
 
 def get_parser():
@@ -127,6 +130,34 @@ def get_confirmation(
     """
 
     return input(f"{dedent(prompt).strip()} ").lower().startswith("y")
+
+
+def delete_items(client, table_name: str, items: List[DynamoItem]):
+    print("deleting:", get_formatted_items(items))
+
+    request_items = {
+        table_name: [{"DeleteRequest": {"Key": item}} for item in items]
+    }
+    backoff_time = 1
+
+    while request_items:
+        response = client.batch_write_item(RequestItems=request_items)
+
+        if response.get("UnprocessedItems"):
+            from time import sleep
+
+            request_items = cast(dict, response["UnprocessedItems"])
+            print(
+                f"Retrying {len(request_items)}",
+                "item" if len(request_items) == 1 else "items",
+                f"after a {backoff_time}-second delay",
+            )
+
+            sleep(backoff_time)
+            backoff_time *= 2
+
+        else:
+            request_items = None
 
 
 def get_formatted_items(items: List[DynamoItem]) -> str:
