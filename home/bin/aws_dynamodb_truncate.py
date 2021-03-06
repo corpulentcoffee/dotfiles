@@ -3,7 +3,8 @@
 
 def main():
     args = get_parser().parse_args()
-    print(args)
+    client = get_dynamodb_client(args.profile, args.region)
+    print(args, client)
 
 
 def get_parser():
@@ -35,6 +36,13 @@ def get_parser():
     )
 
     return parser
+
+
+def get_dynamodb_client(profile: str, region: str):
+    from boto3 import Session
+
+    session = Session(profile_name=profile, region_name=region)
+    return session.client("dynamodb")
 
 
 if __name__ == "__main__":
