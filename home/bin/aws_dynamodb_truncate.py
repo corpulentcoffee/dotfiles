@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 
-from typing import List, cast
+from typing import List, Optional, cast
 
 
 def main() -> int:
     args = get_parser().parse_args()
-    table = get_table(args.profile, args.region, args.table_name)
-    pages = get_item_pages(table)
+    table = get_table(args.profile, args.region, args.table_name, args.retries)
+    pages = get_item_pages(table, args.scan_size)
     first_page = next(pages)
 
     if not first_page:
@@ -55,18 +55,42 @@ def get_parser():
         metavar="TABLE",
         required=True,
     )
+    parser.add_argument(
+        "--scan-size",
+        help="limit number of items read from table at once",
+        metavar="COUNT",
+        type=int,
+    )
+    parser.add_argument(
+        "--retries",
+        help="""
+            control how many times to retry a request (e.g. batch writes might
+            be throttled because a table has a relatively low write capacity)
+        """,
+        metavar="COUNT",
+        type=int,
+    )
 
     return parser
 
 
-def get_table(profile: str, region: str, table_name: str):
+def get_table(
+    profile: str,
+    region: str,
+    table_name: str,
+    retries: Optional[int],
+):
     from boto3 import Session
+    from botocore.config import Config
 
     session = Session(profile_name=profile, region_name=region)
-    return session.resource("dynamodb").Table(table_name)
+    config = Config(retries={"max_attempts": retries}) if retries else Config()
+    dynamodb = session.resource("dynamodb", config=config)
+
+    return dynamodb.Table(table_name)
 
 
-def get_item_pages(table):
+def get_item_pages(table, scan_size: Optional[int]):
     keys = [definition["AttributeName"] for definition in table.key_schema]
     enumerated = list(enumerate(keys))
     params = dict(
@@ -74,6 +98,8 @@ def get_item_pages(table):
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
     )
+    if scan_size:
+        params.update(dict(Limit=scan_size))
 
     while params:
         result = table.scan(**params)
