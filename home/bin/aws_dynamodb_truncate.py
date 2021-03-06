@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from typing import Dict, Iterable, List, Tuple, cast
+from typing import Dict, Iterable, List, cast
 
 from boto3 import Session
 
@@ -16,16 +16,14 @@ def main() -> int:
     client = session.client("dynamodb")
     table = session.resource("dynamodb").Table(args.table_name)
 
-    item_count, keys = get_table_info(client, table.name)
-    batches = in_batches(get_items(client, table.name, keys))
-
+    batches = in_batches(get_items(client, table))
     try:
         first_batch = next(batches)
     except StopIteration:
         print(f"{table.name} is already empty.")
         return 0
 
-    if get_confirmation(table.name, item_count, first_batch) is not True:
+    if get_confirmation(table.name, table.item_count, first_batch) is not True:
         return 1
 
     delete_items(client, table.name, first_batch)
@@ -66,18 +64,11 @@ def get_parser():
     return parser
 
 
-def get_table_info(client, table_name: str) -> Tuple[int, List[str]]:
-    response = client.describe_table(TableName=table_name)
-    table = response["Table"]
-    item_count = table["ItemCount"]
-    keys = [definition["AttributeName"] for definition in table["KeySchema"]]
-    return item_count, keys
-
-
-def get_items(client, table_name: str, attrs: List[str]):
-    enumerated = list(enumerate(attrs))
+def get_items(client, table):
+    keys = [definition["AttributeName"] for definition in table.key_schema]
+    enumerated = list(enumerate(keys))
     params = dict(
-        TableName=table_name,
+        TableName=table.name,
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
     )
