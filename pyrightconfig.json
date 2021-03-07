@@ -1,3 +1,4 @@
 {
+  "executionEnvironments": [{ "root": "home/bin" }],
   "typeCheckingMode": "basic"
 }
