@@ -131,7 +131,7 @@ def get_confirmation(table, sample: List[dict]) -> bool:
 
 def delete_items(batch_writer, items: List[dict]):
     for item in items:
-        batch_writer.delete_item(item)
+        batch_writer.delete_item(Key=item)
 
 
 if __name__ == "__main__":

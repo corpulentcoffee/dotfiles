@@ -43,7 +43,16 @@ def main() -> int:
         print("Copy canceled.")
         return 1
 
-    print(source_table.table_arn, "->", destination_table.table_arn)  # TODO
+    with destination_table.batch_writer() as batch_writer:
+        print(f"copying first {len(first_page)}-item page...")
+        copy_items(batch_writer, first_page)
+        print("scanning the remaining items", end="... ")
+        for successive_page in source_pages:
+            print(f"copying next {len(successive_page)}-item page...")
+            copy_items(batch_writer, successive_page)
+            print("looking for additional items", end="... ")
+        print("got everything; finishing up...")
+    print(f"{destination_table.name} should now be populated.")
     return 0
 
 
@@ -147,6 +156,11 @@ def get_confirmation_summary(table) -> str:
     )
 
     return f"{abbreviated_arn} ({estimate})"
+
+
+def copy_items(batch_writer, items: List[dict]):
+    for item in items:
+        batch_writer.put_item(Item=item)
 
 
 if __name__ == "__main__":
