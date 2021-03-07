@@ -56,7 +56,7 @@ while IFS='' read -rd '' srcPath; do
     mkdir --parents --verbose "$(dirname "$dstPath")"
     ln --relative --symbolic --verbose "$srcPath" "$dstPath"
   fi
-done < <(find . -type f -print0)
+done < <(find . -path ./bin/lib -prune -o -type f -print0)
 
 echo
 echo "already installed: $okayCount"

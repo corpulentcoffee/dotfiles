@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
-from typing import List, Optional, cast
+from typing import List, Optional
 
 
 def main() -> int:
+    from lib.aws.dynamodb import get_item_pages, get_table
+
     args = get_parser().parse_args()
-    table = get_table(args.profile, args.region, args.table_name, args.retries)
-    pages = get_item_pages(table, args.consistent_scan, args.scan_size)
+    table = get_table(args.table_name, args.profile, args.region, args.retries)
+    scan_params = get_scan_params(table, args.consistent_scan, args.scan_size)
+    pages = get_item_pages(table, "scan", **scan_params)
     first_page = next(pages)
 
     if not first_page:
@@ -87,45 +90,15 @@ def get_parser():
     return parser
 
 
-def get_table(
-    profile: str,
-    region: str,
-    table_name: str,
-    retries: Optional[int],
-):
-    from boto3 import Session
-    from botocore.config import Config
-
-    session = Session(profile_name=profile, region_name=region)
-    config = Config(retries={"max_attempts": retries}) if retries else Config()
-    dynamodb = session.resource("dynamodb", config=config)
-
-    return dynamodb.Table(table_name)
-
-
-def get_item_pages(table, consistent_scan: bool, scan_size: Optional[int]):
+def get_scan_params(table, consistent_scan: bool, scan_size: Optional[int]):
     keys = [definition["AttributeName"] for definition in table.key_schema]
     enumerated = list(enumerate(keys))
-    params = dict(
-        TableName=table.name,
+    return dict(
         ProjectionExpression=", ".join(f"#attr{i}" for i, _ in enumerated),
         ExpressionAttributeNames={f"#attr{i}": name for i, name in enumerated},
         ConsistentRead=consistent_scan,
+        Limit=scan_size,
     )
-    if scan_size:
-        params.update(dict(Limit=scan_size))
-
-    while params:
-        result = table.scan(**params)
-        yield cast(List[dict], result["Items"])
-
-        # one can either have the paginator from the DynamoDB client or data
-        # marshalling from the Table resource, and implementing the former is
-        # easier than the latter; see https://github.com/boto/boto3/issues/2039
-        if result.get("LastEvaluatedKey"):
-            params["ExclusiveStartKey"] = result["LastEvaluatedKey"]
-        else:
-            params = None
 
 
 def get_confirmation(table, sample: List[dict]) -> bool:
@@ -143,11 +116,11 @@ def get_confirmation(table, sample: List[dict]) -> bool:
         )
 
     prompt = f"""
-        All items from {table.name} will be deleted.
+        Delete all items in {table.table_arn}?
         {estimate}
 
         Here's a sample of the first batch of items that would be deleted:
-        {get_formatted_items(sample)}
+        {", ".join(repr(item) for item in sample)}
 
         Enter table name to confirm deleting all items:
     """
@@ -158,11 +131,7 @@ def get_confirmation(table, sample: List[dict]) -> bool:
 
 def delete_items(batch_writer, items: List[dict]):
     for item in items:
-        batch_writer.delete_item(item)
-
-
-def get_formatted_items(items: List[dict]) -> str:
-    return ", ".join(repr(item) for item in items)
+        batch_writer.delete_item(Key=item)
 
 
 if __name__ == "__main__":
