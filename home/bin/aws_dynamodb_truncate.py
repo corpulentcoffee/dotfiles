@@ -7,7 +7,7 @@ from lib.aws.dynamodb import get_table
 
 def main() -> int:
     args = get_parser().parse_args()
-    table = get_table(args.profile, args.region, args.table_name, args.retries)
+    table = get_table(args.table_name, args.profile, args.region, args.retries)
     pages = get_item_pages(table, args.consistent_scan, args.scan_size)
     first_page = next(pages)
 

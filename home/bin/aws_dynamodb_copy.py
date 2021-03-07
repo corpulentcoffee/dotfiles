@@ -6,15 +6,15 @@ from lib.aws.dynamodb import get_table
 def main() -> int:
     args = get_parser().parse_args()
     source_table = get_table(
+        args.source_table_name,
         args.source_profile,
         args.source_region,
-        args.source_table_name,
         args.source_retries,
     )
     destination_table = get_table(
+        args.destination_table_name,
         args.destination_profile,
         args.destination_region,
-        args.destination_table_name,
         args.destination_retries,
     )
 

@@ -2,10 +2,10 @@ from typing import Optional
 
 
 def get_table(
-    profile: str,
-    region: str,
     table_name: str,
-    retries: Optional[int],
+    profile: Optional[str] = None,
+    region: Optional[str] = None,
+    retries: Optional[int] = None,
 ):
     from boto3 import Session
     from botocore.config import Config
