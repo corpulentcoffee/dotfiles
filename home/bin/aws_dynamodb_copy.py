@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 
-from lib.aws.dynamodb import get_item_pages, get_table
-
 
 def main() -> int:
+    from lib.aws.dynamodb import get_item_pages, get_table
+
     args = get_parser().parse_args()
     source_table = get_table(
         args.source_table_name,

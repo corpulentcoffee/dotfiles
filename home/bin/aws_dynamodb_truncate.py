@@ -2,10 +2,10 @@
 
 from typing import List, Optional
 
-from lib.aws.dynamodb import get_item_pages, get_table
-
 
 def main() -> int:
+    from lib.aws.dynamodb import get_item_pages, get_table
+
     args = get_parser().parse_args()
     table = get_table(args.table_name, args.profile, args.region, args.retries)
     scan_params = get_scan_params(table, args.consistent_scan, args.scan_size)
