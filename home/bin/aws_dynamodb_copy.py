@@ -37,7 +37,12 @@ def main() -> int:
         print(f"{source_table.name} does not have any items to copy.")
         return 1
     elif (
-        get_confirmation(source_table, destination_table, first_page[0:10])
+        get_confirmation(
+            source_table,
+            destination_table,
+            first_page[0:10],
+            args.transform_command,
+        )
         is not True
     ):
         print("Copy canceled.")
@@ -145,8 +150,18 @@ def get_confirmation(
     source_table,
     destination_table,
     sample: List[dict],
+    transform_command: Optional[str],
 ) -> bool:
     from textwrap import dedent
+
+    copy_sample = (
+        ", ".join(
+            f"{item} as {get_transformed_item(item, transform_command)}"
+            for item in sample
+        )
+        if transform_command
+        else ", ".join(repr(item) for item in sample)
+    )
 
     prompt = f"""
         Copy all items?
@@ -154,7 +169,7 @@ def get_confirmation(
           into {get_confirmation_summary(destination_table)}
 
         Here's a sample of the first batch of items that would be copied:
-        {", ".join(repr(item) for item in sample)}
+        {copy_sample}
 
         Enter destination table name to confirm copying items:
     """
