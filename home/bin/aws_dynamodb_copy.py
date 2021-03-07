@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 
-from typing import List
+from typing import List, Optional
 
 
 def main() -> int:
@@ -45,11 +45,11 @@ def main() -> int:
 
     with destination_table.batch_writer() as batch_writer:
         print(f"copying first {len(first_page)}-item page...")
-        copy_items(batch_writer, first_page)
+        copy_items(batch_writer, first_page, args.transform_command)
         print("scanning the remaining items", end="... ")
         for successive_page in source_pages:
             print(f"copying next {len(successive_page)}-item page...")
-            copy_items(batch_writer, successive_page)
+            copy_items(batch_writer, successive_page, args.transform_command)
             print("looking for additional items", end="... ")
         print("got everything; finishing up...")
     print(f"{destination_table.name} should now be populated.")
@@ -62,12 +62,14 @@ def get_parser():
     parser = ArgumentParser(
         description="""
             Copy all items from one DynamoDB table to another by scanning for
-            its items and then batch writing all items found.
+            its items, optionally applying a data transformation, and then
+            batch writing all items.
         """,
         epilog="""
-            If your source table contains many items and you can create a new
-            destination table rather than use an existing one, consider
-            restoring from a DynamoDB backup as an alternative.
+            If your source table contains many items, you do not need to do any
+            data transformations, and you can create a new destination table
+            rather than use an existing one, consider restoring from a DynamoDB
+            backup as an alternative.
         """,
     )
     parser.add_argument(
@@ -121,6 +123,20 @@ def get_parser():
             metavar="COUNT",
             type=int,
         )
+    parser.add_argument(
+        "--transform-command",
+        help="""
+            if supplied, each item will be dumped to a JSON string, passed as
+            stdin to this shell command, and then loaded back from stdout (e.g.
+            one might do "gron | grep '^json.id =' | gron --ungron" or
+            "jq '{id: .id}'" as a quick and dirty way to copy only the "id"
+            attribute of source items to the destination); simplejson is used
+            to convert to and from JSON when running the transform command,
+            which might have consequences for certain values (e.g. loss of
+            precision for decimal numbers)
+        """,
+        metavar="SHELL",
+    )
 
     return parser
 
@@ -158,9 +174,40 @@ def get_confirmation_summary(table) -> str:
     return f"{abbreviated_arn} ({estimate})"
 
 
-def copy_items(batch_writer, items: List[dict]):
-    for item in items:
-        batch_writer.put_item(Item=item)
+def copy_items(
+    batch_writer,
+    original_items: List[dict],
+    transform_command: Optional[str],
+):
+    for original_item in original_items:
+        transformed_item = (
+            get_transformed_item(original_item, transform_command)
+            if transform_command
+            else original_item
+        )
+        batch_writer.put_item(Item=transformed_item)
+
+
+def get_transformed_item(original_item: dict, transform_command: str) -> dict:
+    from subprocess import PIPE, run
+
+    # DynamoDB Table resources convert numbers to Decimal, which simplejson
+    # handles by converting to regular floats when dumping (possibly losing
+    # precision) whereas the standard library json doesn't handle Decimal at
+    # all; if changing how this works, update `--transform-command` help text
+    # as appropriate
+    from simplejson import dumps, loads
+
+    transformed_output = run(
+        args=transform_command,
+        shell=True,
+        input=dumps(original_item),
+        encoding="utf-8",
+        stdout=PIPE,
+    ).stdout
+
+    transformed_item = loads(transformed_output)
+    return transformed_item
 
 
 if __name__ == "__main__":
