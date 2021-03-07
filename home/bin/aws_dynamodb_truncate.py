@@ -116,11 +116,11 @@ def get_confirmation(table, sample: List[dict]) -> bool:
         )
 
     prompt = f"""
-        All items from {table.name} will be deleted.
+        Delete all items in {table.table_arn}?
         {estimate}
 
         Here's a sample of the first batch of items that would be deleted:
-        {get_formatted_items(sample)}
+        {", ".join(repr(item) for item in sample)}
 
         Enter table name to confirm deleting all items:
     """
@@ -132,10 +132,6 @@ def get_confirmation(table, sample: List[dict]) -> bool:
 def delete_items(batch_writer, items: List[dict]):
     for item in items:
         batch_writer.delete_item(item)
-
-
-def get_formatted_items(items: List[dict]) -> str:
-    return ", ".join(repr(item) for item in items)
 
 
 if __name__ == "__main__":

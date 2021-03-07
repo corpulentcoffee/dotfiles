@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 
+from typing import List
+
+
 def main() -> int:
     from lib.aws.dynamodb import get_item_pages, get_table
 
@@ -32,6 +35,12 @@ def main() -> int:
 
     if not first_page:
         print(f"{source_table.name} does not have any items to copy.")
+        return 1
+    elif (
+        get_confirmation(source_table, destination_table, first_page[0:10])
+        is not True
+    ):
+        print("Copy canceled.")
         return 1
 
     print(source_table.table_arn, "->", destination_table.table_arn)  # TODO
@@ -105,6 +114,39 @@ def get_parser():
         )
 
     return parser
+
+
+def get_confirmation(
+    source_table,
+    destination_table,
+    sample: List[dict],
+) -> bool:
+    from textwrap import dedent
+
+    prompt = f"""
+        Copy all items?
+          from {get_confirmation_summary(source_table)}
+          into {get_confirmation_summary(destination_table)}
+
+        Here's a sample of the first batch of items that would be copied:
+        {", ".join(repr(item) for item in sample)}
+
+        Enter destination table name to confirm copying items:
+    """
+
+    response = input(f"{dedent(prompt).strip()} ")
+    return response.strip().lower() == destination_table.name.strip().lower()
+
+
+def get_confirmation_summary(table) -> str:
+    abbreviated_arn = ":".join(table.table_arn.split(":")[3:])
+    estimate = (
+        f"~{table.item_count} items"
+        if table.item_count > 0
+        else "no item estimate"
+    )
+
+    return f"{abbreviated_arn} ({estimate})"
 
 
 if __name__ == "__main__":
