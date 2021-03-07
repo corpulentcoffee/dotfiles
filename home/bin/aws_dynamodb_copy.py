@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 
-from lib.aws.dynamodb import get_table
+from lib.aws.dynamodb import get_item_pages, get_table
 
 
 def main() -> int:
@@ -20,6 +20,18 @@ def main() -> int:
 
     if source_table.table_arn == destination_table.table_arn:
         print("You cannot copy from/to the same table.")
+        return 1
+
+    source_pages = get_item_pages(
+        source_table,
+        "scan",
+        ConsistentRead=args.source_consistent_scan,
+        Limit=args.source_scan_size,
+    )
+    first_page = next(source_pages)
+
+    if not first_page:
+        print(f"{source_table.name} does not have any items to copy.")
         return 1
 
     print(source_table.table_arn, "->", destination_table.table_arn)  # TODO
