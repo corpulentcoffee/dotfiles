@@ -1,20 +1,24 @@
 # Personal dotfiles
 
+_Everything here is provided "as is", without warranty of any kind._
+
 ## Usage notes
 
 - assumes a GNU/Linux-style userland
 - [`home/`](home) contains files to be installed into the user home directory,
-  keeping those files separate from things needed to maintain and use the
-  repository; thus, [`.vscode/`](.vscode) contains Visual Studio Code
-  configuration pertinent to maintaining this repository and does _not_ contain
-  files to be installed into `~/.config/Code/User/`
+  separating them from things needed to maintain the repository, e.g. for Visual
+  Studio Code configuration:
+  - [`home/.config/Code/User/`](home/.config/Code/User) contains the files to
+    install into `~/.config/Code/User/`
+  - [`.vscode/`](.vscode) contains files specific to working in the `dotfiles`
+    repository workspace
 - [`install.sh`](install.sh) sets up the home directory
   - rather than symlink entire directories, individual files are symlinked after
     creating their directories, allowing finer control over which files are kept
     in version control
   - for better ergonomics, [`bin` scripts](home/bin) are symlinked without their
     extension; additionally, Python scripts are symlinked in kebab case (which
-    is easier to type) rather than the in-repoistory snake case (which is
+    is easier to type) rather than the in-repository snake case (which is
     `import`able)
 - some items assume the presence of other things (e.g. a script might assume
   that certain `.gitconfig` aliases are configured or that another script can be
