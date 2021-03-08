@@ -1,4 +1,29 @@
 #!/usr/bin/env python3
+"""
+Use {AS_ROLE} to run a command after assuming a destination profile's
+role_arn via its source_profile as specified by {PROFILE_PATH}. This can
+be helpful for tools that don't implement cross-profile roles but do
+understand AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_SESSION_TOKEN
+environment variables.
+
+You must have an {PROFILE_PATH} similar to this:
+
+  [organization]
+  aws_access_key_id = XXXXXXXXXXXXXXXXXXXX
+  aws_secret_access_key = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+
+  [production]
+  role_arn = arn:aws:iam::NNNNNNNNNN:role/OrganizationAccountAccessRole
+  source_profile = organization
+  mfa_serial = arn:aws:iam::NNNNNNNNNN:mfa/username
+
+Here, the "organization" profile has credentials with permission to
+assume the role specified by the destination "production" profile. While
+mfa_serial is optional, both role_arn and source_profile must be
+specified on the destination profile. This script does not support
+credential_source on the destination profile; only source_profile is
+supported.
+"""
 
 from typing import List, Optional, Tuple
 
@@ -61,53 +86,28 @@ def get_parser():
 
 def get_parser_help() -> Tuple[str, str]:
     from shutil import get_terminal_size
-    from textwrap import dedent, fill, indent
+    from textwrap import fill
+
+    (
+        description,
+        epilog_intro,
+        epilog_example1,
+        epilog_example2,
+        epilog_explanation,
+    ) = (
+        __doc__.strip().format(**globals()).split("\n\n")
+    )
 
     width = get_terminal_size().columns - 2  # same as argparse HelpFormatter
-
-    def format(text):
-        return fill(dedent(text).strip(), width)
-
-    description = f"""
-        Use {AS_ROLE} to run a command after assuming a destination profile's
-        role_arn via its source_profile as specified by {PROFILE_PATH}. This
-        can be helpful for tools that don't implement cross-profile roles but
-        do understand AWS_ACCESS_KEY_ID/AWS_SECRET_ACCESS_KEY/AWS_SESSION_TOKEN
-        environment variables.
-    """
-
-    epilog_intro = f"""
-        You must have an {PROFILE_PATH} similar to this:
-    """
-
-    epilog_example = """
-        [organization]
-        aws_access_key_id = XXX
-        aws_secret_access_key = XXX
-
-        [production]
-        role_arn = arn:aws:iam::6789012345:role/OrganizationAccountAccessRole
-        source_profile = organization
-        mfa_serial = arn:aws:iam::1234567890:mfa/username
-    """
-
-    epilog_explanation = """
-        Here, the "organization" profile has credentials with permission to
-        assume the role specified by the destination "production" profile.
-
-        While mfa_serial is optional, both role_arn and source_profile must be
-        specified on the destination profile. This script does not support
-        credential_source on the destination profile; only source_profile is
-        supported.
-    """
-
+    description = fill(description, width)
     epilog_blocks = [
-        format(epilog_intro),
-        indent(dedent(epilog_example), prefix="  "),
-        format(epilog_explanation),
+        fill(epilog_intro, width),
+        epilog_example1,
+        epilog_example2,
+        fill(epilog_explanation, width),
     ]
 
-    return format(description), "\n\n".join(epilog_blocks)
+    return description, "\n\n".join(epilog_blocks)
 
 
 def get_profile_config():

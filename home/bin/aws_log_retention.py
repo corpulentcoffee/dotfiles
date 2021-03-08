@@ -1,4 +1,12 @@
 #!/usr/bin/env python3
+"""
+View or set retention policy across multiple log groups.
+
+This script can be helpful used in conjunction with "infrastructure as
+code" deployments that do not explicitly provision log retention
+policies, including Lambda@Edge functions that create their log groups
+across multiple regions.
+"""
 
 from argparse import ArgumentParser
 from os import getenv
@@ -32,15 +40,8 @@ def main():
 
 
 def get_parser():
-    parser = ArgumentParser(
-        description="View or set retention policy across multiple log groups.",
-        epilog="""
-            This script can be helpful used in conjunction with "infrastructure
-            as code" deployments that do not explicitly provision log retention
-            policies, including Lambda@Edge functions that create their log
-            groups across multiple regions.
-        """,
-    )
+    description, epilog = __doc__.split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--profile",
         help="""

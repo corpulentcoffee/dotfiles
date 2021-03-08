@@ -1,4 +1,13 @@
 #!/usr/bin/env python3
+"""
+Given a Lambda function, display its environment variables or run a
+command with those environment variables set.
+
+Note that any command run will be using the AWS credentials of the user
+invoking the script (or no credentials at all if --no-auth-env is used);
+the command will not run with the permissions of the role used by a real
+invocation of the Lambda function.
+"""
 
 from sys import stderr
 
@@ -34,18 +43,8 @@ def main():
 def get_parser():
     from argparse import ArgumentParser
 
-    parser = ArgumentParser(
-        description="""
-            Given a Lambda function, display its environment variables or run a
-            command with those environment variables set.
-        """,
-        epilog="""
-            Note that any command run will be using the AWS credentials of the
-            user invoking the script (or no credentials at all if --no-auth-env
-            is used); the command will not run with the permissions of the role
-            used by a real invocation of the Lambda function.
-        """,
-    )
+    description, epilog = __doc__.split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--profile",
         help="""

@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""
+Run GitHub's Super-Linter locally using Docker.
+
+{LINTER_NAME} will be pulled and ran. See
+<https://github.com/github/super-linter/blob/master/docs/run-linter-locally.md>
+for more information.
+"""
 
 from collections import namedtuple
 from os import getcwd
@@ -23,14 +30,8 @@ def get_parser():
     from argparse import ArgumentParser
     from os.path import abspath, isdir
 
-    parser = ArgumentParser(
-        description="Run GitHub's Super-Linter locally using Docker.",
-        epilog=f"""
-            {LINTER_NAME} will be pulled and ran. See
-            <https://github.com/github/super-linter/blob/master/docs/run-linter-locally.md>
-            for more information.
-        """,
-    )
+    description, epilog = __doc__.format(**globals()).split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
 
     def directory_path(value: str) -> str:
         value = abspath(value)
