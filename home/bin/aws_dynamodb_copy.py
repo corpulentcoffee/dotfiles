@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
+"""
+Copy all items from one DynamoDB table to another by scanning for its
+items, optionally applying a data transformation, and then batch writing
+all items.
 
+If your source table contains many items, you do not need to do any data
+transformations, and you can create a new destination table rather than
+use an existing one, consider restoring from a DynamoDB backup as an
+alternative.
+"""
 
 from typing import List, Optional
 
@@ -64,19 +73,8 @@ def main() -> int:
 def get_parser():
     from argparse import ArgumentParser
 
-    parser = ArgumentParser(
-        description="""
-            Copy all items from one DynamoDB table to another by scanning for
-            its items, optionally applying a data transformation, and then
-            batch writing all items.
-        """,
-        epilog="""
-            If your source table contains many items, you do not need to do any
-            data transformations, and you can create a new destination table
-            rather than use an existing one, consider restoring from a DynamoDB
-            backup as an alternative.
-        """,
-    )
+    description, epilog = __doc__.split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--source-consistent-scan",
         help="""

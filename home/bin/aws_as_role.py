@@ -1,4 +1,10 @@
 #!/usr/bin/env python3
+"""
+Run a command after assuming an IAM role.
+
+Your own credentials must have authorization to obtain temporary tokens
+from the AWS Security Token Service (STS) for the given role.
+"""
 
 from os import environ
 from typing import Dict, List, TypedDict, cast
@@ -39,14 +45,8 @@ def get_parser():
     from argparse import ArgumentParser
 
     # if changing this interface, review aws-as-profile's usage of aws-as-role
-    parser = ArgumentParser(
-        description="Run a command after assuming an IAM role.",
-        epilog="""
-            Your own credentials must have authorization to obtain temporary
-            tokens from the AWS Security Token Service (STS) for the given
-            role.
-        """,
-    )
+    description, epilog = __doc__.split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--profile",
         help="""

@@ -1,4 +1,11 @@
 #!/usr/bin/env python3
+"""
+Clear a DynamoDB table by scanning for its item keys and then batch
+deleting all items found.
+
+If your table contains many items, consider deleting the table as whole
+and creating it again as a cheaper/faster alternative.
+"""
 
 from typing import List, Optional
 
@@ -35,16 +42,8 @@ def main() -> int:
 def get_parser():
     from argparse import ArgumentParser
 
-    parser = ArgumentParser(
-        description="""
-            Clear a DynamoDB table by scanning for its item keys and then batch
-            deleting all items found.
-        """,
-        epilog="""
-            If your table contains many items, consider deleting the table as
-            whole and creating it again as a cheaper/faster alternative.
-        """,
-    )
+    description, epilog = __doc__.split("\n\n")
+    parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--profile",
         help="""

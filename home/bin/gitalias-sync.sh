@@ -1,8 +1,5 @@
 #!/usr/bin/env bash
-
-set -euETo pipefail
-shopt -s inherit_errexit
-
+#
 # Quickly save changes back to the remote, especially in notetaking-style repos.
 # Inspired by <https://gitjournal.io/support/#auto-syncing-from-the-desktop>,
 # but more conservative, with greater opportunities to confirm or bail out of
@@ -14,6 +11,9 @@ shopt -s inherit_errexit
 #
 # [alias]
 # 	sync = !: git commit && gitalias-sync
+
+set -euETo pipefail
+shopt -s inherit_errexit
 
 function msg() {
   echo
