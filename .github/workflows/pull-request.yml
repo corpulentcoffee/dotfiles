@@ -27,6 +27,11 @@ jobs:
       #   thus have a correct `PATH` for accessing `~/bin` scripts); without
       #   this, GitHub would run the script as `bash --noprofile --norc`, which
       #   doesn't setup the `PATH` and doesn't exercise bash-related dotfiles
+      #
+      # Note that having `install.sh` and `test.sh` as separate steps is helpful
+      # for `~/.profile`, which doesn't actually add `~/bin` to the `PATH`
+      # unless it actually exists. On the GitHub Actions runners, this path does
+      # not exist, but `install.sh` will create it.
 
       - run: rm ~/.bash_profile
       - run: ./install.sh
