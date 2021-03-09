@@ -8,11 +8,36 @@ on:
     branches: [master]
 
 jobs:
+  install:
+    name: Install checks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
+      - run: shellcheck install.sh test.sh
+
+      # These steps test that a fresh install actually works. To that end, do a
+      # couple things to make the environment more like a regular Ubuntu system
+      # and less like a GitHub Actions runner:
+      #
+      # - remove files that Ubuntu wouldn't normally ship to users (e.g. Ubuntu
+      #   normally sets up users with a `~/.profile` that does things like add
+      #   `~/bin` to the `PATH` and sourcing `~/.bashrc`; GitHub Actions also
+      #   has a `~/.bash_profile` which would prevent `~/.profile` from running)
+      # - run `test.sh` under a login `shell` so it can pickup `~/.profile` (and
+      #   thus have a correct `PATH` for accessing `~/bin` scripts); without
+      #   this, GitHub would run the script as `bash --noprofile --norc`, which
+      #   doesn't setup the `PATH` and doesn't exercise bash-related dotfiles
+
+      - run: rm ~/.bash_profile
+      - run: ./install.sh
+      - run: ./test.sh
+        shell: bash --login -eo pipefail -- {0}
+
   linter:
     name: Super-Linter checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2
       - uses: github/super-linter@v3.15.2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
