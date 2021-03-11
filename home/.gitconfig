@@ -14,6 +14,7 @@
 ; additional examples, see:
 ; https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
 
+	delete-merged-orphans = !: git branch && gitalias-delete-merged-orphans
 	graph = !: git log && gitalias-graph
 	staged = diff --staged
 	sync = !: git commit && gitalias-sync
