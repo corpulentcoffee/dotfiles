@@ -2,7 +2,7 @@
 #
 # Delete all local branches that
 #
-# - have been merged to HEAD
+# - have been merged to HEAD but aren't the current HEAD branch itself
 #   *and*
 # - used to have an upstream (pull) remote that is now gone
 #   *and*
