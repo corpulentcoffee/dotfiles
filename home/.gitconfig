@@ -16,6 +16,7 @@
 
 	delete-merged-orphans = !: git branch && gitalias-delete-merged-orphans
 	graph = !: git log && gitalias-graph
+	reconcile = !: git commit && gitalias-reconcile
 	staged = diff --staged
 	sync = !: git commit && gitalias-sync
 	up = fetch --all --prune --tags

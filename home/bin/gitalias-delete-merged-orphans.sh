@@ -15,6 +15,10 @@
 #
 # [alias]
 # 	delete-merged-orphans = !: git branch && gitalias-delete-merged-orphans
+#
+# This script returns a non-zero status if there are no branches eligible to
+# delete (because of `grep` in the pipeline combined with `set -o pipefail`).
+# If changing this behavior, see `gitalias-sync.sh`, which checks the status.
 
 set -euETo pipefail
 shopt -s inherit_errexit
