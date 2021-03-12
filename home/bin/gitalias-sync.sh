@@ -1,13 +1,15 @@
 #!/usr/bin/env bash
 #
-# Quickly save changes back to the remote, especially in notetaking-style repos.
-# Inspired by <https://gitjournal.io/support/#auto-syncing-from-the-desktop>,
-# but more conservative, with greater opportunities to confirm or bail out of
-# what is happening.
+# This is a convenience script doing four actions in succession:
 #
-# Arguments to this script will be forwarded along after `git commit --patch`,
-# e.g. `git sync -m <msg>` would become `git commit --patch -m <msg>`. For bash
-# completion to work, `git sync` should be registered as a `commit`-like script:
+# 1. `git reconcile`, see `gitalias-reconcile.sh`
+# 2. update a "backups" remote if it exists and if currently on trunk
+# 3. `git up`, see `../.gitconfig`
+# 4. `git delete-merged-orphans`, see `gitalias-delete-merged-orphans.sh`
+#
+# Arguments to this script will be forwarded to `git reconcile`, which itself
+# forwards those arguments to `git commit`, so `git sync` should be registered
+# as a `commit`-like script:
 #
 # [alias]
 # 	sync = !: git commit && gitalias-sync
@@ -15,38 +17,10 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
-function msg() {
-  echo
-  echo "$*..."
-}
-
-repoToplevel="$(git rev-parse --show-toplevel)"
-cd "$repoToplevel"
-
 repoBranch="$(git symbolic-ref HEAD)" # and we want to error out if off-branch
-repoStatus="$(git status --porcelain)"
+readonly repoBranch
 
-if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
-  mapfile -t newFiles < <(echo "$repoStatus" | grep '^?? ' | cut -d' ' -f2-)
-  for newFile in "${newFiles[@]}"; do
-    read -rp "Add $newFile? "
-    if [[ $REPLY =~ ^[Yy]$ ]]; then
-      git stage --intent-to-add --verbose -- "$newFile"
-    fi
-  done
-
-  # Note that `git commit` returns a non-zero status if nothing is commited.
-  git commit --patch "$@" || true
-
-  msg 'Stashing and then rebasing this branch on remote, if needed'
-  git pull --autostash --rebase --verbose
-else # clean working directory
-  msg 'Rebasing this branch on remote, if needed'
-  git pull --rebase --verbose
-fi
-
-msg 'Updating remote with local changes'
-git push --verbose
+git reconcile "$@"
 
 # Special but not totally uncommon case: secondary remote for the trunk branch.
 # This sort of thing could alternatively be handled by a local in-repo alias
@@ -59,10 +33,16 @@ git push --verbose
 readonly backupRemote=backups
 if [[ $repoBranch =~ ^refs/heads/ma(in|ster)$ ]] &&
   [ -n "$(git branch --remotes --list "$backupRemote/${repoBranch##*/}")" ]; then
-  msg "Updating $backupRemote remote"
+  echo
+  echo "Updating $backupRemote remote"
   git push --verbose -- "$backupRemote" "${repoBranch##*/}"
 fi
 
 # Discover other changes on remote(s) unrelated to current branch.
-msg 'Discovering other changes on remotes'
+echo
+echo 'Discovering other changes on remotes'
 git up
+
+echo
+echo 'Deleting local merged branches that have been orphaned from their remote'
+git delete-merged-orphans || echo 'Nothing to delete'
