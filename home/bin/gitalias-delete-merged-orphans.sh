@@ -23,13 +23,20 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
-readonly listFormat='%(upstream:track):%(push:track):%(HEAD):%(refname:strip=2)'
-readonly isEligible='^\[gone\]:\[gone\]: :'
-readonly branchField=4
+# It's also possible to use `%(refname:strip=2)` instead of `cut`ting out the
+# local part of the full `%(refname)`, but being more explicit here could
+# prevent some future accident where `isEligible` isn't so strict (like not
+# checking for `[gone]` anymore) and something weird (like `--all`) is passed
+# into this script and thus into `git branch`.
+readonly listFormat='%(upstream:track):%(push:track):%(HEAD):%(refname)'
+readonly isEligible='^\[gone\]:\[gone\]: :refs/heads/.'
+readonly refField=4
+readonly localSegment=3
 
 git branch --list --merged HEAD --format "$listFormat" "$@" |
   grep "$isEligible" |
-  cut --delimiter ':' --fields "${branchField}-" |
+  cut --delimiter ':' --fields "${refField}-" |
+  cut --delimiter '/' --fields "${localSegment}-" |
   while read -r branch; do
     git branch --delete "$branch"
   done
