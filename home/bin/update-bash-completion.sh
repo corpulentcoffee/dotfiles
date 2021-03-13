@@ -43,7 +43,8 @@ shopt -s inherit_errexit
 readonly systemDirectory=/usr/share/bash-completion/completions
 readonly userDirectory="${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/completions"
 
-if [ ! -d "$systemDirectory" ]; then
+if [ ! -d "$systemDirectory" ] ||
+  [ "$(find "$systemDirectory" -maxdepth 1 -type f | wc --lines)" -lt 50 ]; then
   echo "system completions doesn't seem to live in $systemDirectory here" >&2
   exit 1
 fi
