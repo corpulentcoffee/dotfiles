@@ -41,7 +41,7 @@ shopt -s inherit_errexit
 # lazy loading based on the command being used, so I think that it's the better
 # method, whereas `~/.bash_completion` is sourced in its entirety every time.
 readonly systemDirectory=/usr/share/bash-completion/completions
-readonly userDirectory=~/.local/share/bash-completion/completions
+readonly userDirectory="${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/completions"
 
 if [ ! -d "$systemDirectory" ]; then
   echo "system completions doesn't seem to live in $systemDirectory here" >&2
