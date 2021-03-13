@@ -59,6 +59,8 @@ installUserCompletion() {
       if [ -e "$userFile" ]; then
         echo "warning: $systemFile and $userFile both exist" >&2
       fi
+    elif [ -L "$userFile" ]; then
+      echo "warning: refusing to overwrite $userFile symlink" >&2
     else
       echo "$* >$userFile"
       "$@" >"$userFile"
