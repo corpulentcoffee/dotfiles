@@ -45,7 +45,7 @@ readonly userDirectory="${XDG_DATA_HOME:-$HOME/.local/share}/bash-completion/com
 
 if [ ! -d "$systemDirectory" ] ||
   [ "$(find "$systemDirectory" -maxdepth 1 -type f | wc --lines)" -lt 50 ]; then
-  echo "system completions doesn't seem to live in $systemDirectory here" >&2
+  echo "system completions do not seem to live in $systemDirectory" >&2
   exit 1
 fi
 mkdir --parents --verbose "$userDirectory"
