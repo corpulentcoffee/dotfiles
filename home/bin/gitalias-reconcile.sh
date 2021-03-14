@@ -32,17 +32,19 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
   done
 
   # Note that `git commit` returns a non-zero status if nothing is commited.
-  git commit "$@" || true
-
   echo
-  echo 'Stashing and then rebasing this branch on remote, if needed'
-  git pull --autostash --rebase --verbose
-else # clean working directory
-  echo
-  echo 'Rebasing this branch on remote, if needed'
-  git pull --rebase --verbose
+  git commit "$@" || echo 'continuing without new commit'
 fi
 
 echo
-echo 'Updating remote with local changes'
+if git push --verbose; then
+  exit 0
+fi
+
+echo
+echo 'Stashing and then rebasing this branch on remote'
+git pull --autostash --rebase --verbose
+
+echo
+echo 'Trying again to update remote'
 git push --verbose
