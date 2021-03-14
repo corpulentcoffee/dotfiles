@@ -46,7 +46,7 @@ if git push --verbose; then # fails if remote is ahead, even if nothing to push
 fi
 
 echo
-echo 'Stashing and then rebasing this branch on remote'
+echo 'Updating this branch from remote' # maybe stashing/rebasing, but maybe not
 git pull --autostash --rebase --verbose
 
 echo
