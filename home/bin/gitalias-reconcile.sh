@@ -5,10 +5,10 @@
 # but more conservative, with greater opportunities to confirm or bail out of
 # what is happening.
 #
-# Arguments to this script will be forwarded along after `git commit --patch`,
-# e.g. `git reconcile -m <msg>` would become `git commit --patch -m <msg>`. For
-# bash completion to work, `git reconcile` should be registered as a
-# `commit`-like script:
+# Arguments to this script will be forwarded along after `git commit`, e.g.
+# `git reconcile -pm <msg>` would become `git commit -pm <msg>`. For bash
+# completion to work, `git reconcile` should be registered as a `commit`-like
+# script:
 #
 # [alias]
 # 	reconcile = !: git commit && gitalias-reconcile
@@ -32,7 +32,7 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
   done
 
   # Note that `git commit` returns a non-zero status if nothing is commited.
-  git commit --patch "$@" || true
+  git commit "$@" || true
 
   echo
   echo 'Stashing and then rebasing this branch on remote, if needed'
