@@ -7,6 +7,11 @@
 set -euxETo pipefail
 shopt -s inherit_errexit
 
+trap on_error ERR
+on_error() {
+  echo 'Test suite failed; manually check your installation.' >&2
+}
+
 test ! -e ~/bin/lib # `install.sh` should have skipped `home/bin/lib` directory
 aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
