@@ -17,3 +17,5 @@ aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
 
 test "$(git whoami | grep -cF dave@corpulent)" -eq 2
+
+echo 'Everything looks okay!'
