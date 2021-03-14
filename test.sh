@@ -12,7 +12,16 @@ on_error() {
   echo 'Test suite failed; manually check your installation.' >&2
 }
 
+test -d ~/bin
 test ! -e ~/bin/lib # `install.sh` should have skipped `home/bin/lib` directory
+
+# Verify everything in bin is executable and we aren't accidentally conflicting
+# with a system-wide bin command, an alias, or some shell built-in.
+for path in ~/bin/*; do
+  test -x "$path"
+  test "$(type -ap "$(basename "$path")" | wc --lines)" -eq 1
+done
+
 aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
 
