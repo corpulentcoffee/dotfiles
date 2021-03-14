@@ -41,7 +41,7 @@ if [ "${#repoStatus}" -ne 0 ]; then # dirty working directory
 fi
 
 echo
-if git push --verbose; then
+if git push --verbose; then # fails if remote is ahead, even if nothing to push
   exit 0
 fi
 
