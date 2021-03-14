@@ -19,7 +19,10 @@ test ! -e ~/bin/lib # `install.sh` should have skipped `home/bin/lib` directory
 # with a system-wide bin command, an alias, or some shell built-in.
 for path in ~/bin/*; do
   test -x "$path"
-  test "$(type -ap "$(basename "$path")" | wc --lines)" -eq 1
+
+  command=$(basename "$path")
+  test "$(type -ap "$command" | wc --lines)" -eq 1
+  test "$(type -at "$command")" == 'file'
 done
 
 aws-as-profile -h | grep -q '^usage: aws-as-profile '
