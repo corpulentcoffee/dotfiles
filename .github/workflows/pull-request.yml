@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
-      - run: shellcheck install.sh test.sh
+      - run: shellcheck *.sh
 
       # These steps test that a fresh install actually works. To that end, do a
       # couple things to make the environment more like a regular Ubuntu system

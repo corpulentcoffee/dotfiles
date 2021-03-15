@@ -23,20 +23,10 @@ set -x
 
 test -d ~/bin
 test ! -e ~/bin/lib # `install.sh` should have skipped `home/bin/lib` directory
-
-# Verify everything in bin is executable and we aren't accidentally conflicting
-# with a system-wide bin command, an alias, or some shell built-in.
-for path in ~/bin/*; do
-  test -x "$path"
-
-  command=$(basename "$path")
-  test "$(type -ap "$command")" == "$HOME/bin/$command"
-  test "$(type -at "$command")" == 'file'
-done
+bash -i test-interactive.sh
 
 aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
-
 test "$(git whoami | grep -cF dave@corpulent)" -eq 2
 
 echo 'Everything looks okay!'
