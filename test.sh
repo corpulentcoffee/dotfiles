@@ -4,13 +4,22 @@
 # checks. Each command here is printed (`set -x`) and the script will exit
 # if something goes wrong (`set -euETo pipefail`, `shopt -s inherit_errexit`).
 
-set -euxETo pipefail
+set -euETo pipefail
 shopt -s inherit_errexit
+
+if ! [[ ":$PATH:" == *":$HOME/bin:"* ]]; then
+  echo "$HOME/bin is absent from the user PATH, which is currently:" >&2
+  echo "$PATH" >&2
+  echo >&2
+  echo 'A logout/login cycle might be needed for ~/.profile to add it' >&2
+  exit 1
+fi
 
 trap on_error ERR
 on_error() {
   echo 'Test suite failed; manually check your installation.' >&2
 }
+set -x
 
 test -d ~/bin
 test ! -e ~/bin/lib # `install.sh` should have skipped `home/bin/lib` directory
