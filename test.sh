@@ -21,7 +21,7 @@ for path in ~/bin/*; do
   test -x "$path"
 
   command=$(basename "$path")
-  test "$(type -ap "$command" | wc --lines)" -eq 1
+  test "$(type -ap "$command")" == "$HOME/bin/$command"
   test "$(type -at "$command")" == 'file'
 done
 
