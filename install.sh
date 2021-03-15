@@ -65,3 +65,6 @@ echo "needs reconciling: $copyCount"
 echo "cleanly installed: $linkCount"
 
 test "$failCount" -eq 0 && test "$copyCount" -eq 0
+
+echo
+echo 'You can run test.sh as a sanity check of the installation.'
