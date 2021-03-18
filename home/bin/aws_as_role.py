@@ -9,7 +9,11 @@ from the AWS Security Token Service (STS) for the given role.
 from os import environ
 from typing import Dict, List, TypedDict, cast
 
-STS_DURATION_SECONDS = 3600
+# IAM roles always allow at least one hour, so when a token does have to
+# be requested, ask for an hour to increase the likelihood that a future
+# aws-as-role invocation will be able to re-use the token. The user can
+# push this higher with `--duration-seconds`, but otherwise use an hour.
+MIN_DURATION_REQUEST = 3600
 
 
 def main():
@@ -30,7 +34,7 @@ def main():
             role_arn=args.role_arn,
             session_name=args.session_name,
             serial_number=args.serial_number,
-            duration_seconds=max(args.duration_seconds, STS_DURATION_SECONDS),
+            duration_seconds=max(args.duration_seconds, MIN_DURATION_REQUEST),
         )
 
     do_spawn(
@@ -85,11 +89,15 @@ def get_parser():
         type=int,
         default=600,
         help=f"""
-            require that at least this many seconds are still remaining on the
-            credentials before running your command (default is %(default)s
-            seconds); additionally, if the value given here is greater than
-            {STS_DURATION_SECONDS}, it will be used to request a longer
-            lifespan on the credentials from STS
+            %(prog)s requests {MIN_DURATION_REQUEST}-second lifespans on tokens
+            from STS in order to cache them for future invocations, and this
+            option configures how many seconds must be remaining on such cached
+            tokens to safely run your command (by default, %(default)s seconds
+            must be remaining before needing to request fresh tokens); if the
+            value given here is greater than {MIN_DURATION_REQUEST}, %(prog)s
+            will use the given value instead of {MIN_DURATION_REQUEST} to
+            request a longer lifespan on the tokens from STS (but the role you
+            are assuming must be configured to allow a longer session duration)
         """,
     )
     parser.add_argument(
@@ -158,20 +166,16 @@ def get_credentials(
 
     session = Session(profile_name=profile)
     sts = session.client("sts")
-    assume_role = sts.assume_role
-
-    response = (
-        assume_role(
-            RoleArn=role_arn,
-            RoleSessionName=session_name,
-            SerialNumber=serial_number,
-            TokenCode=getpass(f"Enter MFA code for {serial_number}: "),
-            DurationSeconds=duration_seconds,
-        )
-        if serial_number
-        else assume_role(RoleArn=role_arn, RoleSessionName=session_name)
+    assume_role_args = dict(
+        RoleArn=role_arn,
+        RoleSessionName=session_name,
+        DurationSeconds=duration_seconds,
     )
+    if serial_number:
+        mfa_code = getpass(f"Enter MFA code for {serial_number}: ")
+        assume_role_args.update(SerialNumber=serial_number, TokenCode=mfa_code)
 
+    response = sts.assume_role(**assume_role_args)
     credentials = dict(
         response["Credentials"],
         Expiration=response["Credentials"]["Expiration"].timestamp(),
