@@ -158,20 +158,16 @@ def get_credentials(
 
     session = Session(profile_name=profile)
     sts = session.client("sts")
-    assume_role = sts.assume_role
-
-    response = (
-        assume_role(
-            RoleArn=role_arn,
-            RoleSessionName=session_name,
-            SerialNumber=serial_number,
-            TokenCode=getpass(f"Enter MFA code for {serial_number}: "),
-            DurationSeconds=duration_seconds,
-        )
-        if serial_number
-        else assume_role(RoleArn=role_arn, RoleSessionName=session_name)
+    assume_role_args = dict(
+        RoleArn=role_arn,
+        RoleSessionName=session_name,
+        DurationSeconds=duration_seconds,
     )
+    if serial_number:
+        mfa_code = getpass(f"Enter MFA code for {serial_number}: ")
+        assume_role_args.update(SerialNumber=serial_number, TokenCode=mfa_code)
 
+    response = sts.assume_role(**assume_role_args)
     credentials = dict(
         response["Credentials"],
         Expiration=response["Credentials"]["Expiration"].timestamp(),
