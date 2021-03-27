@@ -75,3 +75,4 @@ installUserCompletion flutter bash-completion
 installUserCompletion gh completion -s bash
 installUserCompletion kubectl completion bash
 installUserCompletion minikube completion bash
+installUserCompletion pip3 completion --bash
