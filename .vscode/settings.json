@@ -3,6 +3,10 @@
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.formatOnSave": true,
 
+  "files.associations": {
+    "**/.aws/cli/alias": "ini"
+  },
+
   /** Assumes `black` already present, like via `pip3 install --user` or apt. */
   "python.formatting.provider": "black",
 
