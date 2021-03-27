@@ -20,7 +20,7 @@ set -x
 # Verify everything in bin is executable and we aren't accidentally conflicting
 # with a system-wide bin command, an alias, or some shell built-in.
 for path in ~/bin/*; do
-  test -x "$path"
+  test -x "$path" # will also fail on a dangling symlink
 
   command=$(basename "$path")
   test "$(type -ap "$command")" == "$HOME/bin/$command"
