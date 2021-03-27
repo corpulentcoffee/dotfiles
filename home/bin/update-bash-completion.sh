@@ -59,7 +59,13 @@ installUserCompletion() {
       echo "warning: refusing to overwrite $userFile symlink" >&2
     else
       echo "$* >$userFile"
-      "$@" >"$userFile"
+
+      local completionContent
+      if completionContent=$("$@") && [ -n "$completionContent" ]; then
+        echo "$completionContent" >"$userFile"
+      else
+        echo "  ... that didn't work; not writing to $userFile" >&2
+      fi
     fi
   else
     echo "$1 is not installed"
