@@ -75,4 +75,17 @@ installUserCompletion flutter bash-completion
 installUserCompletion gh completion -s bash
 installUserCompletion kubectl completion bash
 installUserCompletion minikube completion bash
+
+(
+  if [ -n "${NVM_DIR:-}" ]; then # use completions from latest Node.js LTS
+    # shellcheck source=/dev/null
+    source "$NVM_DIR/nvm.sh" # nvm available until end of subshell
+    set +u
+    nvm use --lts || nvm install --lts # environ altered until end of subshell
+    set -u
+  fi
+  installUserCompletion node --completion-bash
+  installUserCompletion npm completion
+)
+
 installUserCompletion pip3 completion --bash
