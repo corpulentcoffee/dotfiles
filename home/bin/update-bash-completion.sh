@@ -66,8 +66,13 @@ installUserCompletion() {
   fi
 }
 
+# Presenting certain environ variables can dissuade some tools (e.g. Flutter)
+# from doing unwanted things (e.g. upgrade checks) while generating completion
+# output.
+export CI=true
+
 installUserCompletion aws bash-completion # ../.aws/cli/alias avails this
-installUserCompletion flutter bash-completion
+installUserCompletion flutter bash-completion --no-version-check
 installUserCompletion gh completion -s bash
 installUserCompletion kubectl completion bash
 installUserCompletion minikube completion bash
