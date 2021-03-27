@@ -23,6 +23,9 @@ for path in ~/bin/*; do
   test -x "$path" # will also fail on a dangling symlink
 
   command=$(basename "$path")
-  test "$(type -ap "$command")" == "$HOME/bin/$command"
-  test "$(type -at "$command")" == 'file'
+
+  # If the user path contains ~/bin multiple times, then `type -a` will also
+  # output multiple times, so `sort --unique` is used here to de-duplicate.
+  test "$(type -ap "$command" | sort --unique)" == "$HOME/bin/$command"
+  test "$(type -at "$command" | sort --unique)" == 'file'
 done
