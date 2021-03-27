@@ -1,0 +1,15 @@
+aliases:
+    # Additional notes on how aliases work (correct as of March 2021):
+    # - Aliases trying to override the built-in subcommands (like `repo`) aren't
+    #   supported and are ignored.
+    # - The shell completion code output by `gh completion` doesn't take aliases
+    #   into account, so neither the aliases themselves nor arguments/options
+    #   for the proxied commands are completed.
+    #
+    # Given the basic nature of alias support by `gh`, keep things here simple
+    # and reserve more complex things for external `gh-xxx` scripts.
+    #
+    # See <https://cli.github.com/manual/gh_alias_set> or `gh help alias set`
+    # for additional examples.
+    co: pr checkout # this alias is shipped by default
+    pv: pr view
