@@ -16,14 +16,9 @@
 # at any time to freshen those bash completion files as new versions of tools
 # are released.
 #
-# What this script does not handle, however, and shouldn't need to handle:
-#
-# - Tools which are `complete`-compatible, which do not slow down shell
-#   initialization and can go into `.bashrc`, e.g. the AWS CLI (`aws`) has a
-#   `aws_completer` setup something like this: `complete -C ~/aws_completer aws`
-# - Tools that come with a pre-baked bash completion file as part of their code;
-#   these can just be symlinked into the user bash completion directory, e.g.
-#   `ln -s $NVM_DIR/bash_completion nvm` while in the user completion directory
+# Note that some tools come with pre-baked bash completion files in their code;
+# these can just be symlinked into the user bash completion directory, e.g.
+# `ln -s $NVM_DIR/bash_completion nvm` while in the user completion directory
 
 set -euETo pipefail
 shopt -s inherit_errexit
@@ -71,6 +66,7 @@ installUserCompletion() {
   fi
 }
 
+installUserCompletion aws bash-completion # ../.aws/cli/alias avails this
 installUserCompletion flutter bash-completion
 installUserCompletion gh completion -s bash
 installUserCompletion kubectl completion bash
