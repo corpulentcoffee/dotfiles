@@ -16,14 +16,9 @@
 # at any time to freshen those bash completion files as new versions of tools
 # are released.
 #
-# What this script does not handle, however, and shouldn't need to handle:
-#
-# - Tools which are `complete`-compatible, which do not slow down shell
-#   initialization and can go into `.bashrc`, e.g. the AWS CLI (`aws`) has a
-#   `aws_completer` setup something like this: `complete -C ~/aws_completer aws`
-# - Tools that come with a pre-baked bash completion file as part of their code;
-#   these can just be symlinked into the user bash completion directory, e.g.
-#   `ln -s $NVM_DIR/bash_completion nvm` while in the user completion directory
+# Note that some tools come with pre-baked bash completion files in their code;
+# these can just be symlinked into the user bash completion directory, e.g.
+# `ln -s $NVM_DIR/bash_completion nvm` while in the user completion directory
 
 set -euETo pipefail
 shopt -s inherit_errexit
@@ -64,14 +59,40 @@ installUserCompletion() {
       echo "warning: refusing to overwrite $userFile symlink" >&2
     else
       echo "$* >$userFile"
-      "$@" >"$userFile"
+
+      local completionContent
+      if completionContent=$("$@") && [ -n "$completionContent" ]; then
+        echo "$completionContent" >"$userFile"
+      else
+        echo "  ... that didn't work; not writing to $userFile" >&2
+      fi
     fi
   else
     echo "$1 is not installed"
   fi
 }
 
-installUserCompletion flutter bash-completion
+# Presenting certain environ variables can dissuade some tools (e.g. Flutter)
+# from doing unwanted things (e.g. upgrade checks) while generating completion
+# output.
+export CI=true
+
+installUserCompletion aws bash-completion # ../.aws/cli/alias avails this
+installUserCompletion flutter bash-completion --no-version-check
 installUserCompletion gh completion -s bash
 installUserCompletion kubectl completion bash
 installUserCompletion minikube completion bash
+
+(
+  if [ -n "${NVM_DIR:-}" ]; then # use completions from latest Node.js LTS
+    # shellcheck source=/dev/null
+    source "$NVM_DIR/nvm.sh" # nvm available until end of subshell
+    set +u
+    nvm use --lts || nvm install --lts # environ altered until end of subshell
+    set -u
+  fi
+  installUserCompletion node --completion-bash
+  installUserCompletion npm completion
+)
+
+installUserCompletion pip3 completion --bash

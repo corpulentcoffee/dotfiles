@@ -59,12 +59,18 @@ while IFS='' read -rd '' srcPath; do
 done < <(find . -path ./bin/lib -prune -o -type f -print0)
 
 echo
-echo "already installed: $okayCount"
-echo "failed to install: $failCount"
-echo "needs reconciling: $copyCount"
-echo "cleanly installed: $linkCount"
-
 test "$failCount" -eq 0 && test "$copyCount" -eq 0
 
-echo
-echo 'You can run test.sh as a sanity check of the installation.'
+cat <<EOF
+Summary
+- already installed: $okayCount
+- failed to install: $failCount
+- needs reconciling: $copyCount
+- cleanly installed: $linkCount
+
+Hints
+- if this is a new/newish install, a logout/login cycle might be helpful
+  (e.g. for ~/.profile to see ~/bin and add it to the PATH)
+- you can run update-bash-completion for common tools that might be installed
+- you can run ./test.sh as a sanity check of the installation
+EOF
