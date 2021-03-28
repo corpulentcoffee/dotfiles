@@ -61,6 +61,28 @@ done < <(find . -path ./bin/lib -prune -o -type f -print0)
 echo
 test "$failCount" -eq 0 && test "$copyCount" -eq 0
 
+if [ "${CODESPACES-false}" == "true" ]; then
+  echo 'Making Codespaces-specific adjustments...'
+
+  # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
+  # contains a core.editor setting I don't need, so use my .gitconfig instead.
+  if [ "$(md5sum <.gitconfig)" == "43ba1caca81a816ae18ac0857ad83b53  -" ]; then
+    git checkout .gitconfig
+  fi
+
+  # ~/.profile on Ubuntu will usually handle this, but because Codespaces are
+  # durable and ~/bin doesn't exist when the container is setup, there is never
+  # an opportunity for ~/.profile to run again. In lieu of ~/.profile, this is
+  # the best way to get ~/bin in the PATH that I can think of right now.
+  # shellcheck disable=SC2016  # use unexpanded $HOME literally in strings below
+  if ! grep --fixed-strings --quiet '$HOME/bin:$PATH' ~/.bashrc; then
+    echo 'PATH="$HOME/bin:$PATH"' >>~/.bashrc
+  fi
+
+  echo '...done'
+  echo
+fi
+
 cat <<EOF
 Summary
 - already installed: $okayCount
