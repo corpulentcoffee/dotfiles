@@ -29,4 +29,25 @@ aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
 test "$(git whoami | grep -cF dave@corpulent)" -eq 2
 
+(
+  # This relies on `aws_completer` ignoring user aliases. If that changes (which
+  # would be great!), then this test won't work anymore as written.
+  set +x
+  echo 'checking that AWS CLI aliases do not shadow built-in commands...'
+
+  aliases=$(grep --perl-regexp '^\s*[\w-]+\s*=' ~/.aws/cli/alias | cut -d'=' -f1)
+  builtins=$(COMMAND_LINE='aws ' aws_completer)
+  readonly aliases builtins
+
+  test "$(echo "$aliases" | wc --lines)" -gt 1
+  test "$(echo "$builtins" | wc --lines)" -gt 250
+  for alias in $aliases; do
+    echo -n "$alias: "
+    if echo "$builtins" | grep "\b${alias}\b"; then
+      exit 1
+    fi
+    echo "OK"
+  done
+)
+
 echo 'Everything looks okay!'
