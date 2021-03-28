@@ -33,6 +33,10 @@ test "$(git whoami | grep -cF dave@corpulent)" -eq 2
   # This relies on `aws_completer` ignoring user aliases. If that changes (which
   # would be great!), then this test won't work anymore as written.
   set +x
+  if ! type aws_completer; then
+    echo 'warning: skipping AWS CLI alias shadowing test' >&2
+    exit
+  fi
   echo 'checking that AWS CLI aliases do not shadow built-in commands...'
 
   aliases=$(grep --perl-regexp '^\s*[\w-]+\s*=' ~/.aws/cli/alias | cut -d'=' -f1)
