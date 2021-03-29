@@ -20,7 +20,7 @@ bash -i test-interactive.sh
 
 aws-as-profile -h | grep -q '^usage: aws-as-profile '
 gh-super-linter --help | grep -q '^usage: gh-super-linter '
-test "$(git whoami | grep -cF dave@corpulent)" -eq 2
+git whoami | grep --quiet --fixed-strings dave@corpulent
 
 (
   # This relies on `aws_completer` ignoring user aliases. If that changes (which
