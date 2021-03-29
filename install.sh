@@ -90,7 +90,9 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # an opportunity for ~/.profile to run again. In lieu of ~/.profile, this is
   # the best way to get ~/bin in the PATH that I can think of right now.
   # shellcheck disable=SC2016  # use unexpanded $HOME literally in strings below
-  if ! grep --fixed-strings --quiet '$HOME/bin:$PATH' ~/.bashrc; then
+  if [[ ! ":$PATH:" == *":$HOME/bin:"* ]] &&
+    ! grep --fixed-strings --quiet '$HOME/bin:$PATH' ~/.bashrc; then
+    echo 'Modifying .bashrc to include ~/bin in the user PATH...'
     echo 'PATH="$HOME/bin:$PATH"' >>~/.bashrc
   fi
 
