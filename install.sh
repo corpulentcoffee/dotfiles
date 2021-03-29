@@ -62,12 +62,27 @@ echo
 test "$failCount" -eq 0 && test "$copyCount" -eq 0
 
 if [ "${CODESPACES-false}" == "true" ]; then
+  # GitHub Codespaces is still in preview. These tweaks work as of March 2021,
+  # but things can still change...
   echo 'Making Codespaces-specific adjustments...'
 
   # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
   # contains a core.editor setting I don't need, so use my .gitconfig instead.
   if [ "$(md5sum <.gitconfig)" == "43ba1caca81a816ae18ac0857ad83b53  -" ]; then
     git checkout .gitconfig
+  fi
+
+  # Visual Studio Code in Codespaces uses Settings Sync, a "machine"/"remote"
+  # `settings.json`, and in-repo `.vscode/settings.json`. It does NOT read from
+  # the desktop-standard `~/.config/Code/User/settings.json`. Because the
+  # "machine"/"remote" one doesn't exist initially, it can just be replaced with
+  # a symlink to the dotfiles version. ALTERNATIVELY, Settings Sync could be
+  # used for these settings, possibly(?) still keeping them version-controlled.
+  readonly codespacesSettings=~/.vscode-remote/data/Machine
+  if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
+    [ ! -e "$codespacesSettings/settings.json" ]; then
+    ln --relative --symbolic --verbose \
+      .config/Code/User/settings.json "$codespacesSettings/settings.json"
   fi
 
   # ~/.profile on Ubuntu will usually handle this, but because Codespaces are
