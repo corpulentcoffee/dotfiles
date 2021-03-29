@@ -57,9 +57,7 @@ while IFS='' read -rd '' srcPath; do
     ln --relative --symbolic --verbose "$srcPath" "$dstPath"
   fi
 done < <(find . -path ./bin/lib -prune -o -type f -print0)
-
 echo
-test "$failCount" -eq 0 && test "$copyCount" -eq 0
 
 if [ "${CODESPACES-false}" == "true" ]; then
   # GitHub Codespaces is still in preview. These tweaks work as of March 2021,
