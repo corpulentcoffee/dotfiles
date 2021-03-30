@@ -60,8 +60,8 @@ done < <(find . -path ./bin/lib -prune -o -type f -print0)
 echo
 
 if [ "${CODESPACES-false}" == "true" ]; then
-  # GitHub Codespaces is still in preview. These tweaks work as of March 2021,
-  # but things can still change...
+  # GitHub Codespaces is still in preview. These tweaks worked and these notes
+  # were accurate as of March 2021, but things can still change...
   echo 'Making Codespaces-specific adjustments...'
 
   # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
@@ -70,18 +70,46 @@ if [ "${CODESPACES-false}" == "true" ]; then
     git checkout .gitconfig
   fi
 
-  # Visual Studio Code in Codespaces uses Settings Sync, a "machine"/"remote"
-  # `settings.json`, and in-repo `.vscode/settings.json`. It does NOT read from
-  # the desktop-standard `~/.config/Code/User/settings.json`. Because the
-  # "machine"/"remote" one doesn't exist initially, it can just be replaced with
-  # a symlink to the dotfiles version. ALTERNATIVELY, Settings Sync could be
-  # used for these settings, possibly(?) still keeping them version-controlled.
+  # Visual Studio Code in Codespaces collects its settings from three "scopes":
+  #
+  # 1. a "/User/settings.json" key stored via the browser's IndexedDB API that
+  #    can optionally be synced using Settings Sync, which may be pointing at
+  #    either the "VS Code Stable" or "Insiders" servers depending on the setup;
+  # 2. a "machine"/"remote" `~/.vscode-remote/data/Machine/settings.json`, which
+  #    is actually intended to be used with an in-repo `devcontainer.json`; and
+  # 3. the in-repo `.vscode/settings.json`, if any.
+  #
+  # The desktop-standard `~/.config/Code/User/settings.json` from the dotfiles
+  # is not "currently" used.
+  #
+  # However, because the "machine"/"remote" one actually persists to disk and
+  # because it doesn't initially exist unless `devcontainer.json` is used, a
+  # symlink can just be created from the "machine"/"remote" settings location to
+  # the dotfiles version.
+  #
+  # Alternatively, Settings Sync (which itself is still in preview) could be
+  # used for these settings, probably still keeping them version-controlled here
+  # via regular desktop machines that don't use the IndexedDB API for storage.
   readonly codespacesSettings=~/.vscode-remote/data/Machine
   if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
     [ ! -e "$codespacesSettings/settings.json" ]; then
     ln --relative --symbolic --verbose \
       .config/Code/User/settings.json "$codespacesSettings/settings.json"
   fi
+
+  # Likewise, Visual Studio Code in Codespaces doesn't read the desktop-standard
+  # `~/.config/Code/User/keybindings.json`. Further, it only uses the IndexedDB
+  # storage for these, so there's no on-disk location to symlink.
+  #
+  # Again, using Settings Sync could probably be used for these. When using
+  # Settings Sync, keybindings are synchronized by platform by default, but I'm
+  # not sure if "web browser on Linux" counts as "linux" or as "web". If keeping
+  # to platforms like Linux and Windows, keybindings should be platform-agnostic
+  # and the `settingsSync.keybindingsPerPlatform` setting could be disabled.
+  # Alternatively, even without fully enabling Settings Sync across all devices,
+  # Settings Sync can be enabled just in the Codespaces environment, effectively
+  # creating a "'web-platform' keybindings" file.
+  echo 'warning: Visual Studio Code keybindings.json cannot be setup here' >&2
 
   # ~/.profile on Ubuntu will usually handle this, but because Codespaces are
   # durable and ~/bin doesn't exist when the container is setup, there is never
