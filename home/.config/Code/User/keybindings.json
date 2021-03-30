@@ -1,0 +1,22 @@
+[
+  /** Open URLs or navigate between files */
+  {
+    "key": "alt+enter",
+    "command": "editor.action.openLink",
+    "when": "editorFocus && !findWidgetVisible"
+  },
+
+  /** Unneeded and conflicts w/ one of the "add cursor below" keybindings */
+  {
+    "key": "shift+alt+down",
+    "command": "-markdown.extension.onCopyLineDown" /* yzhang.markdown-all-in-one */,
+    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+  },
+
+  /** Unneeded and conflicts w/ one of the "add cursor above" keybindings */
+  {
+    "key": "shift+alt+up",
+    "command": "-markdown.extension.onCopyLineUp" /* yzhang.markdown-all-in-one */,
+    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+  }
+]
