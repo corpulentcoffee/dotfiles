@@ -1,3 +1,7 @@
+/**
+ * In the GitHub Codespaces environment, this file currently cannot be made
+ * available via a file system symlink. See dotfiles `install.sh`.
+ */
 [
   /** Open URLs or navigate between files */
   {
