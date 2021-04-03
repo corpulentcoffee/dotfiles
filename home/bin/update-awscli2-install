@@ -23,7 +23,8 @@ readonly installDir=~/opt/aws-cli
 readonly binDir=~/bin
 readonly binPath=$binDir/aws
 readonly packageUrl=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
-readonly keepOldVersions=3
+readonly keepVersions=3 # including the new current version
+test "$keepVersions" -ge 1
 
 # Sanity check the installation is how we'd expect before touching anything.
 
@@ -82,7 +83,7 @@ if [ -s "$tempZip" ]; then # package on the web is newer than local
   find 'v2' -mindepth 1 -maxdepth 1 -type d -name '2.*.*' |
     cut --delimiter=/ --fields=2 |
     sort --version-sort |
-    head --lines=-"$keepOldVersions" |
+    head --lines=-"$keepVersions" |
     while read -r version; do
       echo "removing old version $version from $installDir/v2 directory"
       rm --recursive "./v2/$version"
