@@ -32,3 +32,9 @@
 [user]
 	name = Dave Shifflett
 	email = dave@corpulent.coffee
+
+; Optional local tweak: override certain settings when operating on repos in a
+; particular directory (e.g. override `user.email` and then try `git whoami`).
+;
+; [includeIf "gitdir:~/Repos/workplace/"]
+; 	path = ~/.gitconfig.workplace
