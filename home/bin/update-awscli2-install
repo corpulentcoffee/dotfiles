@@ -23,6 +23,7 @@ readonly installDir=~/opt/aws-cli
 readonly binDir=~/bin
 readonly binPath=$binDir/aws
 readonly packageUrl=https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+readonly keepOldVersions=3
 
 # Sanity check the installation is how we'd expect before touching anything.
 
@@ -42,8 +43,13 @@ verify "$installDir/v2 is directory" test -d "$installDir/v2"
 verify "$installDir/v2/current is symlink" test -L "$installDir/v2/current"
 verify "$binPath is symlink" test -L "$binPath"
 verify "$binPath is executable" test -x "$binPath"
+
 verify "$binPath points to $installDir/v2/current/bin/aws" \
   test "$(readlink "$binPath")" == "$installDir/v2/current/bin/aws"
+
+verify "$installDir/v2/current points to a sibling version directory" \
+  grep --perl-regexp \
+  "^$installDir/v2/2\.\d+\.\d+\$" <(readlink "$installDir/v2/current")
 
 # Okay, let's do it...
 
@@ -71,6 +77,17 @@ if [ -s "$tempZip" ]; then # package on the web is newer than local
 
   echo "was $oldVersion"
   echo "now $("$binPath" --version)"
+
+  # If these aren't cleaned up, they will just accumulate forever...
+  cd "$installDir"
+  find 'v2' -mindepth 1 -maxdepth 1 -type d -name '2.*.*' |
+    cut --delimiter=/ --fields=2 |
+    sort --version-sort |
+    head --lines=-"$keepOldVersions" |
+    while read -r version; do
+      echo "removing old version $version from $installDir/v2 directory"
+      rm --recursive "./v2/$version"
+    done
 else
   echo 'AWS CLI already up-to-date:'
   echo "$oldVersion"
