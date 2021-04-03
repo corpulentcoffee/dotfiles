@@ -79,15 +79,17 @@ if [ -s "$tempZip" ]; then # package on the web is newer than local
   echo "was $oldVersion"
 
   # If these aren't cleaned up, they will just accumulate forever...
-  cd "$installDir"
-  find 'v2' -mindepth 1 -maxdepth 1 -type d -name '2.*.*' |
-    cut --delimiter=/ --fields=2 |
-    sort --version-sort |
-    head --lines=-"$keepVersions" |
-    while read -r version; do
-      echo "removing old version $version from $installDir/v2 directory"
-      rm --recursive "./v2/$version"
-    done
+  (
+    cd "$installDir"
+    find 'v2' -mindepth 1 -maxdepth 1 -type d -name '2.*.*' |
+      cut --delimiter=/ --fields=2 |
+      sort --version-sort |
+      head --lines=-"$keepVersions" |
+      while read -r version; do
+        echo "removing old version $version from $installDir/v2 directory"
+        rm --recursive "./v2/$version"
+      done
+  )
 
   echo "now $("$binPath" --version)"
 else
