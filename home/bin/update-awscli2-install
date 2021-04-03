@@ -76,7 +76,6 @@ if [ -s "$tempZip" ]; then # package on the web is newer than local
     --bin-dir "$binDir"
 
   echo "was $oldVersion"
-  echo "now $("$binPath" --version)"
 
   # If these aren't cleaned up, they will just accumulate forever...
   cd "$installDir"
@@ -88,6 +87,8 @@ if [ -s "$tempZip" ]; then # package on the web is newer than local
       echo "removing old version $version from $installDir/v2 directory"
       rm --recursive "./v2/$version"
     done
+
+  echo "now $("$binPath" --version)"
 else
   echo 'AWS CLI already up-to-date:'
   echo "$oldVersion"
