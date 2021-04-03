@@ -49,7 +49,7 @@ verify "$binPath points to $installDir/v2/current/bin/aws" \
   test "$(readlink "$binPath")" == "$installDir/v2/current/bin/aws"
 
 verify "$installDir/v2/current points to a sibling version directory" \
-  grep --perl-regexp \
+  grep --quiet --perl-regexp \
   "^$installDir/v2/2\.\d+\.\d+\$" <(readlink "$installDir/v2/current")
 
 # Okay, let's do it...
