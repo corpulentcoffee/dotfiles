@@ -47,6 +47,7 @@ while IFS='' read -rd '' srcPath; do
   elif [ -f "$dstPath" ]; then
     ((++copyCount))
     echo "$srcPath: $dstPath already exists; use version control to reconcile"
+    echo -n "cp "
     cp --verbose "$dstPath" "$srcPath"
     ln --force --relative --symbolic --verbose "$srcPath" "$dstPath"
   else
