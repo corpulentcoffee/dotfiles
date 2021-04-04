@@ -9,7 +9,7 @@ if [[ ! "$HOME" =~ ^/ ]]; then
   echo 'HOME must be set and must be using an absolute path.' >&2
   exit 1
 elif [ "$(git rev-parse --is-inside-work-tree)" != 'true' ]; then
-  # We need git to be present and working for `git check-ignore` path checks.
+  # We need git to be present and working for `git ls-tree`.
   echo 'git must be installed and repository data must be present.' >&2
   exit 1
 fi
@@ -20,21 +20,19 @@ copyCount=0
 linkCount=0
 
 while IFS='' read -rd '' srcPath; do
-  if git check-ignore "$srcPath" >/dev/null; then
-    continue
-  fi
-
-  # Install Python and shell script bin files without suffix, and switch Python
-  # scripts from importable snake case to ergonomic kebab case.
-  if [[ "$srcPath" =~ ^\./bin/[a-z0-9_-]+\.(py|sh)$ ]]; then
-    dstPath="${srcPath%.*}"
-    if [[ "$srcPath" =~ \.py$ ]]; then
-      dstPath="${dstPath//_/-}"
+  dstPath="$srcPath"                         # symlink most files at same path
+  if [[ "$srcPath" == "bin/"* ]]; then       # except bin files are special
+    if [[ "$srcPath" == "bin/lib/"* ]]; then # do not symlink common bin modules
+      continue
+    elif [[ "$srcPath" == "bin/"?*.?* ]]; then # make scripts easier to type
+      dstPath="${srcPath%.*}"                  # strip file extension
+      dstPath="${dstPath//_/-}"                # switch snake case to kebab case
+    else
+      echo "unexpected non-script file in bin directory" >&2
+      exit 1
     fi
-  else
-    dstPath="$srcPath"
   fi
-  dstPath="$HOME/${dstPath#./}"
+  dstPath="$HOME/$dstPath"
 
   if [ -L "$dstPath" ]; then
     srcReal="$(realpath "$srcPath")"
@@ -49,6 +47,7 @@ while IFS='' read -rd '' srcPath; do
   elif [ -f "$dstPath" ]; then
     ((++copyCount))
     echo "$srcPath: $dstPath already exists; use version control to reconcile"
+    echo -n "cp "
     cp --verbose "$dstPath" "$srcPath"
     ln --force --relative --symbolic --verbose "$srcPath" "$dstPath"
   else
@@ -56,7 +55,7 @@ while IFS='' read -rd '' srcPath; do
     mkdir --parents --verbose "$(dirname "$dstPath")"
     ln --relative --symbolic --verbose "$srcPath" "$dstPath"
   fi
-done < <(find . -path ./bin/lib -prune -o -type f -print0)
+done < <(git ls-tree -rz --name-only HEAD) # only use committed files
 echo
 
 if [ "${CODESPACES-false}" == "true" ]; then
