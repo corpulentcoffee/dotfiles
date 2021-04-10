@@ -2,8 +2,9 @@
 #
 # Do an upgrade of all pip packages that were directly installed (i.e. not as a
 # dependency) in "user-site" (i.e. with `--user`; on typical Ubuntu installs,
-# these are libraries installed to `~/.local/lib/python3.x/site-packages/` and
-# command-line tools installed to `~/.local/bin`).
+# these are libraries installed to `~/.local/lib/python3.x/site-packages/`,
+# command-line tools installed to `~/.local/bin`, and less commonly, ancillary
+# files placed into `~/.local/etc`).
 
 set -euETo pipefail
 shopt -s inherit_errexit

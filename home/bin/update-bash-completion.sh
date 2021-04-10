@@ -16,9 +16,13 @@
 # at any time to freshen those bash completion files as new versions of tools
 # are released.
 #
-# Note that some tools come with pre-baked bash completion files in their code;
-# these can just be symlinked into the user bash completion directory, e.g.
-# `ln -s $NVM_DIR/bash_completion nvm` while in the user completion directory
+# Note that some user-installed tools come with pre-baked bash completion files
+# with their packaging or code but might not correctly install themselves; these
+# can just be symlinked while in the user completion directory, e.g.:
+#
+# - `ln -s $NVM_DIR/bash_completion nvm` for the Node Version Manager
+# - `ln -s ~/.local/etc/bash_completion.d/xxx.bash-completion xxx` for some
+#   pip-packaged `--user` installed CLI tools
 
 set -euETo pipefail
 shopt -s inherit_errexit
