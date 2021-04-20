@@ -7,7 +7,7 @@ shopt -s inherit_errexit
 
 readonly endpoint='https://checkip.amazonaws.com/'
 
-if ! curl --fail "$endpoint"; then
+if ! curl --fail --silent "$endpoint"; then
   echo "Unable to query $endpoint" >&2
   exit 1
 fi
