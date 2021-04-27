@@ -29,7 +29,7 @@ def get_item_pages(table, method: Literal["query", "scan"], **params):
 
     params = {key: value for key, value in params.items() if value is not None}
 
-    while params is not None:
+    while True:
         result = getattr(table, method)(**params)
         yield cast(List[dict], result["Items"])
 
@@ -40,4 +40,4 @@ def get_item_pages(table, method: Literal["query", "scan"], **params):
         if result.get("LastEvaluatedKey"):
             params["ExclusiveStartKey"] = result["LastEvaluatedKey"]
         else:
-            params = None
+            break
