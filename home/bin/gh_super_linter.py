@@ -15,7 +15,7 @@ LINTER_NAME = "github/super-linter"  # both GitHub Action and Docker image name
 DEFAULT_VERSION = "latest"
 CODEBASE_MOUNT = "/tmp/lint"
 
-Setup = namedtuple("SuperLinterSetup", ["path", "job", "step", "img", "env"])
+Setup = namedtuple("Setup", ["path", "job", "step", "img", "env"])
 
 
 def main():
@@ -107,7 +107,7 @@ def get_docker_container_image_version(step_spec: dict) -> Optional[str]:
     try:
         uses = step_spec["uses"]
     except KeyError:
-        pass
+        return None
     else:
         return (
             DEFAULT_VERSION
@@ -131,7 +131,7 @@ def get_env_without_expressions(step_spec: dict) -> dict:
 
 def choose_superlinter_setup(setups: List[Setup]) -> Optional[Setup]:
     if not setups:
-        return
+        return None
 
     count = len(setups)
     if count == 1:
