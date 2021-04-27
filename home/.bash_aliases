@@ -23,3 +23,14 @@ function open() {
     done
   fi
 }
+
+# Avoid installing and running random npm packages if a typo or other mistake is
+# made. Instead, explicitly use `--install` (e.g. `npx --install -- eslint ...`)
+# or `--package=xxx` (e.g. `npx --package=eslint -- eslint ...`) explicitly to
+# download and execute a package. Alternatively, `\npx` or `nvm exec npx` can
+# also be used to bypass this alias.
+#
+# As of npm/npx v7, npx will print a "Need to install the following packages"
+# prompt before installing anything. npm/npx v7 ship with node v15+, so once
+# that is widespread, this alias can likely be eliminated.
+alias npx='npx --no-install'
