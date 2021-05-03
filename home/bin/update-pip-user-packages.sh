@@ -12,12 +12,11 @@ shopt -s inherit_errexit
 readonly pip=pip3
 readonly expectedPip=/usr/bin/$pip
 
-if ! command -v "$pip" >/dev/null; then
+if ! actualPip=$(command -v "$pip") >/dev/null; then
   echo "The $pip tool is not installed here." >&2
   exit 1
 fi
-
-readonly actualPip=$(command -v "$pip")
+readonly actualPip
 
 if ! [ "$actualPip" == "$expectedPip" ]; then
   echo "The current $pip tool is $actualPip rather than $expectedPip." >&2
