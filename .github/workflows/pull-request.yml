@@ -12,7 +12,7 @@ jobs:
     name: Install checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
+      - uses: actions/checkout@v2.3.4 # repository available as $GITHUB_WORKSPACE
       - run: shellcheck *.sh
       - run: shellcheck --shell=bash home/.bash* # these are sourced scripts too
 
@@ -43,7 +43,7 @@ jobs:
     name: Super-Linter checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: github/super-linter@v3.17.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
@@ -63,7 +63,7 @@ jobs:
     name: Python checks
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2.3.4
       - uses: actions/setup-python@v2
         with:
           python-version: "3.8.5" # as on Ubuntu 20.04
