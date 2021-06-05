@@ -26,6 +26,8 @@
   "telemetry.enableTelemetry": false,
 
   "terminal.integrated.allowChords": false,
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.tabs.focusMode": "singleClick",
 
   "[python]": {
     "editor.rulers": [
