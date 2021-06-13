@@ -9,6 +9,7 @@ for more information.
 
 from collections import namedtuple
 from os import getcwd
+from pathlib import Path
 from typing import Any, Callable, List, Optional
 
 LINTER_NAME = "github/super-linter"  # both GitHub Action and Docker image name
@@ -87,8 +88,6 @@ def get_superlinter_setups(workflow_path: str, error: Callable[[str], Any]):
 
 
 def get_workflow_paths():
-    from pathlib import Path
-
     current = Path(getcwd())
 
     return (
@@ -99,7 +98,7 @@ def get_workflow_paths():
         )
         for paths in [directory.glob("*.yaml"), directory.glob("*.yml")]
         for path in paths
-        if path.is_file
+        if path.is_file()
     )
 
 
@@ -180,6 +179,15 @@ def run_docker_container(
 
     print(f"Mounting {codebase_path} as {CODEBASE_MOUNT} in container.")
     args.extend(["--volume", f"{codebase_path}:{CODEBASE_MOUNT}"])
+
+    no_git = not Path(codebase_path).joinpath(".git").is_dir()
+    no_ufa_env = not (setup and "USE_FIND_ALGORITHM" in setup.env)
+    if no_git and no_ufa_env:
+        print(
+            f"{codebase_path} won't have a .git directory once mounted; "
+            "enabling USE_FIND_ALGORITHM so linter will be able to run."
+        )
+        args.extend(["--env", "USE_FIND_ALGORITHM=true"])
 
     if setup:
         print(
