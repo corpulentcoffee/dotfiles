@@ -99,7 +99,7 @@ def get_workflow_paths():
         )
         for paths in [directory.glob("*.yaml"), directory.glob("*.yml")]
         for path in paths
-        if path.is_file
+        if path.is_file()
     )
 
 
