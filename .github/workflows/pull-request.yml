@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: github/super-linter@v4.2.2
+      - uses: github/super-linter@v4.4.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
 
@@ -57,6 +57,7 @@ jobs:
           # Some built-in Python-related features from the Super-Linter are
           # disabled here in favor of the "Python checks" below.
           VALIDATE_PYTHON_BLACK: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
 
   python:
