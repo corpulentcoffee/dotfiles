@@ -57,6 +57,7 @@ jobs:
           # Some built-in Python-related features from the Super-Linter are
           # disabled here in favor of the "Python checks" below.
           VALIDATE_PYTHON_BLACK: false
+          VALIDATE_PYTHON_MYPY: false
           VALIDATE_PYTHON_PYLINT: false
 
   python:
