@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
-      - run: shellcheck *.sh
+      - run: shellcheck -- *.sh
       - run: shellcheck --shell=bash home/.bash* # these are sourced scripts too
 
       # These steps test that a fresh install actually works. To that end, do a
