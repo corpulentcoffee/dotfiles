@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2 # repository available as $GITHUB_WORKSPACE
-      - run: shellcheck *.sh
+      - run: shellcheck -- *.sh
       - run: shellcheck --shell=bash home/.bash* # these are sourced scripts too
 
       # These steps test that a fresh install actually works. To that end, do a
@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: github/super-linter@v4.5.1
+      - uses: github/super-linter@v4.6.0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
 
