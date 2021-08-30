@@ -14,6 +14,7 @@
 ; additional examples, see:
 ; https://github.com/git/git/blob/master/contrib/completion/git-completion.bash
 
+	co = checkout
 	delete-merged-orphans = !: git branch && gitalias-delete-merged-orphans
 	graph = !: git log && gitalias-graph
 	reconcile = !: git commit && gitalias-reconcile
