@@ -37,5 +37,9 @@
       /** regular lines */ 79
     ],
     "editor.tabSize": 4
+  },
+
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }
