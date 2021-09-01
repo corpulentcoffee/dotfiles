@@ -43,6 +43,7 @@ def main():
 def get_parser():
     from argparse import ArgumentParser
 
+    assert type(__doc__) is str, "expecting module-level docstring"
     description, epilog = __doc__.split("\n\n")
     parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(

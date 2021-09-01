@@ -88,6 +88,7 @@ def get_parser_help() -> Tuple[str, str]:
     from shutil import get_terminal_size
     from textwrap import fill
 
+    assert type(__doc__) is str, "expecting module-level docstring"
     (
         description,
         epilog_intro,
