@@ -3,6 +3,9 @@
  * projects can benefit from an in-repository `.vscode/settings.json` that is
  * specific to the mutual expectations of that project's contributors.
  *
+ * The dotfiles repository is just for me, so its `.vscode/settings.json` just
+ * assumes that this file is already symlinked.
+ *
  * In the GitHub Codespaces environment, this file is special-case symlinked as
  * the "machine"/"remote" `settings.json` file. See dotfiles `install.sh`.
  */

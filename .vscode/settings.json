@@ -1,7 +1,10 @@
+/**
+ * This file only needs settings specific to managing the dotfiles repository;
+ * it can be assumed `../home/.config/Code/User/settings.json` is symlinked and
+ * in effect, so only overrides and additional settings need be present here.
+ */
 {
   "editor.codeActionsOnSave": { "source.organizeImports": true },
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.formatOnSave": true,
 
   "files.associations": {
     "**/.aws/cli/alias": "ini"
@@ -15,9 +18,5 @@
 
   "[python]": {
     "editor.defaultFormatter": "ms-python.python"
-  },
-
-  "[shellscript]": {
-    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }
