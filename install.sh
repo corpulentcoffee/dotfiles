@@ -59,12 +59,12 @@ done < <(git ls-tree -rz --name-only HEAD) # only use committed files
 echo
 
 if [ "${CODESPACES-false}" == "true" ]; then
-  # GitHub Codespaces is still in preview. These tweaks worked and these notes
-  # were accurate as of March 2021, but things can still change...
+  # These tweaks worked and these notes were accurate as of September 2021.
   echo 'Codespaces-specific adjustments:'
 
-  # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
-  # contains a core.editor setting I don't need, so use my .gitconfig instead.
+  # The .gitconfig on the pre-GA Codespaces (verified by this md5sum check) just
+  # contained a core.editor setting I didn't need, so could use .gitconfig from
+  # dotfiles instead. This doesn't trip anymore in the GA version of Codespaces.
   if [ "$(md5sum <.gitconfig)" == "43ba1caca81a816ae18ac0857ad83b53  -" ]; then
     echo '- discarding Codespaces-provided .gitconfig for dotfiles-provided one'
     git checkout .gitconfig
@@ -82,20 +82,33 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # The desktop-standard `~/.config/Code/User/settings.json` from the dotfiles
   # is not "currently" used.
   #
-  # However, because the "machine"/"remote" one actually persists to disk and
-  # because it doesn't initially exist unless `devcontainer.json` is used, a
-  # symlink can just be created from the "machine"/"remote" settings location to
-  # the dotfiles version.
-  #
-  # Alternatively, Settings Sync (which itself is still in preview) could be
-  # used for these settings, probably still keeping them version-controlled here
-  # via regular desktop machines that don't use the IndexedDB API for storage.
+  # Alternatively, Settings Sync could be used for these settings, probably
+  # still keeping them version-controlled in the dotfiles repository via regular
+  # desktop machines that don't use the IndexedDB API for storage.
   readonly codespacesSettings=~/.vscode-remote/data/Machine
-  if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
-    [ ! -e "$codespacesSettings/settings.json" ]; then
-    echo -n "- linking machine settings to dotfiles: "
-    ln --relative --symbolic --verbose \
-      .config/Code/User/settings.json "$codespacesSettings/settings.json"
+  readonly dotfilesSettings=.config/Code/User
+  if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ]; then
+    if [ -e "$codespacesSettings/settings.json" ]; then
+      if [ -f "$codespacesSettings/settings.json" ] &&
+        [ ! -L "$codespacesSettings/settings.json" ]; then
+        # "machine"/"remote" settings already exist, so merge dotfiles version
+        # with the Codespaces version, preferring settings from the latter; this
+        # method can propagate dotfiles settings additions, but requires manual
+        # intervention to propagate settings *changes*, since the original value
+        # will be in the "machine"/"remote" settings file and thus will persist
+        echo "- merging machine and dotfiles settings"
+        jq --slurp add \
+          <(npx --package relaxed-json -- rjson "$dotfilesSettings/settings.json") \
+          <(npx --package relaxed-json -- rjson "$codespacesSettings/settings.json") |
+          sponge "$codespacesSettings/settings.json"
+      fi
+    else
+      # "machine"/"remote" settings don't already exist, so symlink can just be
+      # created from "machine"/"remote" settings location to dotfiles version
+      echo -n "- linking machine settings to dotfiles: "
+      ln --relative --symbolic --verbose \
+        "$dotfilesSettings/settings.json" "$codespacesSettings/settings.json"
+    fi
   fi
 
   # Likewise, Visual Studio Code in Codespaces doesn't read the desktop-standard
