@@ -59,8 +59,7 @@ done < <(git ls-tree -rz --name-only HEAD) # only use committed files
 echo
 
 if [ "${CODESPACES-false}" == "true" ]; then
-  # GitHub Codespaces is still in preview. These tweaks worked and these notes
-  # were accurate as of March 2021, but things can still change...
+  # These tweaks worked and these notes were accurate as of September 2021.
   echo 'Codespaces-specific adjustments:'
 
   # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
