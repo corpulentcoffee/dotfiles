@@ -82,21 +82,21 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # The desktop-standard `~/.config/Code/User/settings.json` from the dotfiles
   # is not "currently" used.
   #
-  # However, because the "machine"/"remote" one actually persists to disk and
-  # because it doesn't initially exist unless `devcontainer.json` is used, a
-  # symlink can just be created from the "machine"/"remote" settings location to
-  # the dotfiles version.
-  #
   # Alternatively, Settings Sync (which itself is still in preview) could be
   # used for these settings, probably still keeping them version-controlled here
   # via regular desktop machines that don't use the IndexedDB API for storage.
   readonly codespacesSettings=~/.vscode-remote/data/Machine
   readonly dotfilesSettings=.config/Code/User
-  if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
-    [ ! -e "$codespacesSettings/settings.json" ]; then
-    echo -n "- linking machine settings to dotfiles: "
-    ln --relative --symbolic --verbose \
-      "$dotfilesSettings/settings.json" "$codespacesSettings/settings.json"
+  if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ]; then
+    if [ -e "$codespacesSettings/settings.json" ]; then
+      echo 'TODO'
+    else
+      # "machine"/"remote" settings don't already exist, so symlink can just be
+      # created from "machine"/"remote" settings location to dotfiles version
+      echo -n "- linking machine settings to dotfiles: "
+      ln --relative --symbolic --verbose \
+        "$dotfilesSettings/settings.json" "$codespacesSettings/settings.json"
+    fi
   fi
 
   # Likewise, Visual Studio Code in Codespaces doesn't read the desktop-standard
