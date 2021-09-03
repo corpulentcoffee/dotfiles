@@ -91,11 +91,12 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # used for these settings, probably still keeping them version-controlled here
   # via regular desktop machines that don't use the IndexedDB API for storage.
   readonly codespacesSettings=~/.vscode-remote/data/Machine
+  readonly dotfilesSettings=.config/Code/User
   if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
     [ ! -e "$codespacesSettings/settings.json" ]; then
     echo -n "- linking machine settings to dotfiles: "
     ln --relative --symbolic --verbose \
-      .config/Code/User/settings.json "$codespacesSettings/settings.json"
+      "$dotfilesSettings/settings.json" "$codespacesSettings/settings.json"
   fi
 
   # Likewise, Visual Studio Code in Codespaces doesn't read the desktop-standard
