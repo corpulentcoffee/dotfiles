@@ -61,11 +61,12 @@ echo
 if [ "${CODESPACES-false}" == "true" ]; then
   # GitHub Codespaces is still in preview. These tweaks worked and these notes
   # were accurate as of March 2021, but things can still change...
-  echo 'Making Codespaces-specific adjustments...'
+  echo 'Codespaces-specific adjustments:'
 
   # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
   # contains a core.editor setting I don't need, so use my .gitconfig instead.
   if [ "$(md5sum <.gitconfig)" == "43ba1caca81a816ae18ac0857ad83b53  -" ]; then
+    echo '- discarding Codespaces-provided .gitconfig for dotfiles-provided one'
     git checkout .gitconfig
   fi
 
@@ -92,6 +93,7 @@ if [ "${CODESPACES-false}" == "true" ]; then
   readonly codespacesSettings=~/.vscode-remote/data/Machine
   if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ] &&
     [ ! -e "$codespacesSettings/settings.json" ]; then
+    echo -n "- linking machine settings to dotfiles: "
     ln --relative --symbolic --verbose \
       .config/Code/User/settings.json "$codespacesSettings/settings.json"
   fi
@@ -108,7 +110,7 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # Alternatively, even without fully enabling Settings Sync across all devices,
   # Settings Sync can be enabled just in the Codespaces environment, effectively
   # creating a "'web-platform' keybindings" file.
-  echo 'warning: Visual Studio Code keybindings.json cannot be setup here' >&2
+  echo '- Visual Studio Code keybindings.json cannot be setup here'
 
   # ~/.profile on Ubuntu will usually handle this, but because Codespaces are
   # durable and ~/bin doesn't exist when the container is setup, there is never
@@ -117,11 +119,10 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # shellcheck disable=SC2016  # use unexpanded $HOME literally in strings below
   if [[ ! ":$PATH:" == *":$HOME/bin:"* ]] &&
     ! grep --fixed-strings --quiet '$HOME/bin:$PATH' ~/.bashrc; then
-    echo 'Modifying .bashrc to include ~/bin in the user PATH...'
+    echo '- modifying .bashrc to include ~/bin in the user PATH'
     echo 'PATH="$HOME/bin:$PATH"' >>~/.bashrc
   fi
 
-  echo '...done'
   echo
 fi
 
