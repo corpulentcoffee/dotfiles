@@ -89,7 +89,19 @@ if [ "${CODESPACES-false}" == "true" ]; then
   readonly dotfilesSettings=.config/Code/User
   if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ]; then
     if [ -e "$codespacesSettings/settings.json" ]; then
-      echo 'TODO'
+      if [ -f "$codespacesSettings/settings.json" ] &&
+        [ ! -L "$codespacesSettings/settings.json" ]; then
+        # "machine"/"remote" settings already exist, so merge dotfiles version
+        # with the Codespaces version, preferring settings from the latter; this
+        # method can propagate dotfiles settings additions, but requires manual
+        # intervention to propagate settings *changes*, since the original value
+        # will be in the "machine"/"remote" settings file and thus will persist
+        echo "- merging machine and dotfiles settings"
+        jq --slurp add \
+          <(npx --package relaxed-json -- rjson "$dotfilesSettings/settings.json") \
+          <(npx --package relaxed-json -- rjson "$codespacesSettings/settings.json") |
+          sponge "$codespacesSettings/settings.json"
+      fi
     else
       # "machine"/"remote" settings don't already exist, so symlink can just be
       # created from "machine"/"remote" settings location to dotfiles version
