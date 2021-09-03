@@ -62,8 +62,9 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # These tweaks worked and these notes were accurate as of September 2021.
   echo 'Codespaces-specific adjustments:'
 
-  # Today's stock .gitconfig on Codespaces (verified by this md5sum check) just
-  # contains a core.editor setting I don't need, so use my .gitconfig instead.
+  # The .gitconfig on the pre-GA Codespaces (verified by this md5sum check) just
+  # contained a core.editor setting I didn't need, so could use .gitconfig from
+  # dotfiles instead. This doesn't trip anymore in the GA version of Codespaces.
   if [ "$(md5sum <.gitconfig)" == "43ba1caca81a816ae18ac0857ad83b53  -" ]; then
     echo '- discarding Codespaces-provided .gitconfig for dotfiles-provided one'
     git checkout .gitconfig
@@ -81,9 +82,9 @@ if [ "${CODESPACES-false}" == "true" ]; then
   # The desktop-standard `~/.config/Code/User/settings.json` from the dotfiles
   # is not "currently" used.
   #
-  # Alternatively, Settings Sync (which itself is still in preview) could be
-  # used for these settings, probably still keeping them version-controlled here
-  # via regular desktop machines that don't use the IndexedDB API for storage.
+  # Alternatively, Settings Sync could be used for these settings, probably
+  # still keeping them version-controlled in the dotfiles repository via regular
+  # desktop machines that don't use the IndexedDB API for storage.
   readonly codespacesSettings=~/.vscode-remote/data/Machine
   readonly dotfilesSettings=.config/Code/User
   if [ -d "$codespacesSettings" ] && [ ! -L "$codespacesSettings" ]; then
