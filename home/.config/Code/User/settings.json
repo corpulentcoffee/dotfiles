@@ -27,8 +27,9 @@
 
   "javascript.updateImportsOnFileMove.enabled": "always",
 
-  "telemetry.enableCrashReporter": false,
-  "telemetry.enableTelemetry": false,
+  /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
+  /** @deprecated by `telemetryLevel` */ "telemetry.enableTelemetry": false,
+  "telemetry.telemetryLevel": "off",
 
   "terminal.integrated.allowChords": false,
   "terminal.integrated.tabs.enabled": true,
