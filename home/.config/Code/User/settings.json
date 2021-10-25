@@ -6,10 +6,15 @@
  * The dotfiles repository is just for me, so its `.vscode/settings.json` just
  * assumes that this file is already symlinked.
  *
- * In the GitHub Codespaces environment, this file is special-case symlinked as
- * the "machine"/"remote" `settings.json` file. See dotfiles `install.sh`.
+ * In GitHub Codespaces, this file is special-case symlinked as (or merged into
+ * with) the "machine"/"remote" `settings.json` file. See dotfiles `install.sh`.
  */
 {
+  "editor.codeActionsOnSave": {
+    "source.organizeImports":
+      /** For Python, requires Microsoft's Python extension. */
+      true
+  },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily":
     /**
@@ -40,6 +45,17 @@
 
   "javascript.updateImportsOnFileMove.enabled": "always",
 
+  "python.formatting.provider":
+    /**
+     * Requires Microsoft's Python extension (see `editor.defaultFormatter` in
+     * `[python]` section below) and a local install of Black, like via apt or
+     * `pip3 install --user black`.
+     */
+    "black",
+  "python.languageServer":
+    /** Requires Microsoft's Pylance extension. */
+    "Pylance",
+
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
   /** @deprecated by `telemetryLevel` */ "telemetry.enableTelemetry": false,
   "telemetry.telemetryLevel": "off",
@@ -58,6 +74,7 @@
   "typescript.inlayHints.variableTypes.enabled": true,
 
   "[python]": {
+    "editor.defaultFormatter": "ms-python.python",
     "editor.rulers": [
       /** documentation */ { "column": 72, "color": "#333" },
       /** regular lines */ 79

@@ -1,3 +1,8 @@
+/**
+ * These extensions are generally used by global defaults in the home-installed
+ * `../home/.config/Code/User/settings.json`, so all of them should probably be
+ * enabled globally in Visual Studio Code.
+ */
 {
   "recommendations": [
     /**
@@ -9,10 +14,12 @@
     /** Provide autoformatting for shell scripts and some others. */
     "foxundermoon.shell-format",
 
-    /** Autoformatting and more; see also `settings.json`. */
-    "ms-python.python",
-
-    /** Language server typechecking w/ pyright; see also `settings.json` */
-    "ms-python.vscode-pylance"
+    /**
+     * Autoformatting, typechecking and more. Automatically enables Pyright by
+     * installing the `ms-python.vscode-pylance` extension. The Python extension
+     * will also install some other Jupyter-related extensions, but those can be
+     * disabled without affecting the Python functionality.
+     */
+    "ms-python.python"
   ]
 }
