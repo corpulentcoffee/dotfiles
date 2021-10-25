@@ -17,13 +17,26 @@
      * package, supports programming ligatures. `editor.fontLigatures` must also
      * be enabled for these to be rendered.
      */
-    "'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace, 'Droid Sans Fallback'",
+    "'Cascadia Code', monospace",
   "editor.fontLigatures": true,
+  "editor.fontSize": 14,
   "editor.formatOnSave": true,
+  "editor.inlayHints.enabled": true,
+  "editor.inlayHints.fontFamily": "sans",
+  "editor.inlayHints.fontSize": 10,
   "editor.renderControlCharacters": true,
   "editor.renderWhitespace": "all",
   "editor.rulers": [80],
   "editor.tabSize": 2,
+
+  // see also `typescript.inlayHints` settings below
+  "javascript.inlayHints.enumMemberValues.enabled": true,
+  "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "javascript.inlayHints.parameterNames.enabled": "all",
+  "javascript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+  "javascript.inlayHints.parameterTypes.enabled": true,
+  "javascript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "javascript.inlayHints.variableTypes.enabled": true,
 
   "javascript.updateImportsOnFileMove.enabled": "always",
 
@@ -34,6 +47,15 @@
   "terminal.integrated.allowChords": false,
   "terminal.integrated.tabs.enabled": true,
   "terminal.integrated.tabs.focusMode": "singleClick",
+
+  // see also `javascript.inlayHints` settings above
+  "typescript.inlayHints.enumMemberValues.enabled": true,
+  "typescript.inlayHints.functionLikeReturnTypes.enabled": true,
+  "typescript.inlayHints.parameterNames.enabled": "all",
+  "typescript.inlayHints.parameterNames.suppressWhenArgumentMatchesName": true,
+  "typescript.inlayHints.parameterTypes.enabled": true,
+  "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
+  "typescript.inlayHints.variableTypes.enabled": true,
 
   "[python]": {
     "editor.rulers": [
