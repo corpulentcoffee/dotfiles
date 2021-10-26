@@ -45,16 +45,13 @@
 
   "javascript.updateImportsOnFileMove.enabled": "always",
 
+  // `python` settings use Microsoft's Python extension (`ms-python.python`) or
+  // its Pylance dependency (`ms-python.vscode-pylance`).
+  "python.analysis.typeCheckingMode": "strict",
   "python.formatting.provider":
-    /**
-     * Requires Microsoft's Python extension (see `editor.defaultFormatter` in
-     * `[python]` section below) and a local install of Black, like via apt or
-     * `pip3 install --user black`.
-     */
+    /** Needs a local Black install, like via apt or `pip3 install --user`. */
     "black",
-  "python.languageServer":
-    /** Requires Microsoft's Pylance extension. */
-    "Pylance",
+  "python.languageServer": "Pylance",
 
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
   /** @deprecated by `telemetryLevel` */ "telemetry.enableTelemetry": false,
