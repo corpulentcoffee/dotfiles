@@ -20,6 +20,21 @@
      * will also install some other Jupyter-related extensions, but those can be
      * disabled without affecting the Python functionality.
      */
-    "ms-python.python"
+    "ms-python.python",
+
+    /**
+     * Provide in-editor checking of shell scripts.
+     *
+     * If needed, the `shellcheck.customArgs` setting can be used for special
+     * behavior, e.g. `["--external-sources"]` would allow `source`/`.`d scripts
+     * to be followed when a file is checked; see explanation for SC1091. Some
+     * of these can (or will be able to) be expressed in `.shellcheckrc`, making
+     * the behavior consistent between in-editor and the terminal.
+     *
+     * For the `--external-sources` example specifically, see:
+     * - https://github.com/koalaman/shellcheck/issues/1818
+     * - https://github.com/koalaman/shellcheck/compare/v0.7.2...master
+     */
+    "timonwong.shellcheck"
   ]
 }
