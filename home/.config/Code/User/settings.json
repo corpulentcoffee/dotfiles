@@ -70,6 +70,10 @@
   "typescript.inlayHints.propertyDeclarationTypes.enabled": true,
   "typescript.inlayHints.variableTypes.enabled": true,
 
+  "[ignore]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+
   "[python]": {
     "editor.defaultFormatter": "ms-python.python",
     "editor.rulers": [
