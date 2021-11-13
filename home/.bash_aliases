@@ -1,16 +1,4 @@
 # shellcheck shell=bash
-
-# A standard Ubuntu `~/.bashrc` comes from `/etc/skel/.bashrc`, and will source
-# `~/.bash_aliases` if it exists and if the shell is interactive. Because it's
-# sourced, technically anything can be included here to affect the initializing
-# shell. Under some environments, like GitHub Codespaces, `~/.bashrc` is like
-# `/etc/skel/.bashrc`, but has additional stuff at the end (like NVS), so having
-# a dotfiles with `.bashrc` is inconvenient. However, these places still source
-# `~/.bash_aliases`, so this is an entry point to customize whatever want.
-#
-# shellcheck source=./home/.bash_behavior
-source ~/.bash_behavior
-
 # Aliases here should be kept simple for maintenance purposes and are best
 # suited anyway for things that need to effect a change in the current shell
 # and/or that will only be used interactively. Most other things probably belong
@@ -88,3 +76,14 @@ function set-proxy-environ() {
     unset ALL_PROXY FTP_PROXY HTTP_PROXY HTTPS_PROXY RSYNC_PROXY
   fi
 }
+
+# A standard Ubuntu `~/.bashrc` comes from `/etc/skel/.bashrc`, and will source
+# `~/.bash_aliases` if it exists and if the shell is interactive. Because it's
+# sourced, technically anything can be included here to affect the initializing
+# shell. Under some environments, like GitHub Codespaces, `~/.bashrc` is like
+# `/etc/skel/.bashrc`, but has additional stuff at the end (like NVS), so having
+# a dotfiles with `.bashrc` is inconvenient. However, these places still source
+# `~/.bash_aliases`, so this is an entry point to customize whatever want.
+#
+# shellcheck source=./home/.bash_behavior
+source ~/.bash_behavior
