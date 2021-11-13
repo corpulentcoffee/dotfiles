@@ -18,6 +18,9 @@ source ~/.bash_behavior
 
 alias cd-dotfiles='cd "$(whereis-dotfiles)"'
 
+# Like Ubuntu's `ll`, except order directories first.
+alias ll='ls -alF --group-directories-first'
+
 # Avails `xdg-open` as `open` with some added functionality:
 # - `open` without any argument tells `xdg-open` to open the current working
 #   directory in the default file browser
