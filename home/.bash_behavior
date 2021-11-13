@@ -1,2 +1,19 @@
 # shellcheck shell=bash
 # This is sourced from `.bash_aliases` under interactive bash; see notes there.
+
+# Print status code after each command finishes. This checks `$?`, so it needs
+# to be the first thing executed on `$PROMPT_COMMAND`, so try to define this as
+# late as possible during shell initialization.
+function __ccdotfiles_promptCommandExitStatus {
+  local status=$?
+
+  # Display newline after output to guarantee prompt appears on its own even if
+  # last output didn't have trailing newline; it's nice to have this here
+  # instead of `PS1` in case something prepends onto `PS1` (e.g. `virtualenv`s).
+  echo
+
+  if [ "$status" != 0 ]; then
+    echo -e "\\e[0;41mexit status $status\\e[0m"
+  fi
+}
+PROMPT_COMMAND="__ccdotfiles_promptCommandExitStatus; $PROMPT_COMMAND"
