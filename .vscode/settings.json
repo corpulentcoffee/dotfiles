@@ -5,6 +5,7 @@
  */
 {
   "files.associations": {
-    "**/.aws/cli/alias": "ini"
+    "**/.aws/cli/alias": "ini",
+    "**/.bash_behavior": "shellscript"
   }
 }

@@ -1,0 +1,2 @@
+# shellcheck shell=bash
+# This is sourced from `.bash_aliases` under interactive bash; see notes there.
