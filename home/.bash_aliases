@@ -47,6 +47,12 @@ alias npx='npx --no-install'
 # Sets (or unsets) and then exports all variations of proxy-related environment
 # variables to try to maximize interoperability with different tools; see the
 # examples given in <https://unix.stackexchange.com/questions/212894> on why.
+#
+# `sudo` resets environment variables by default, so if proxy needs to be used
+# for `sudo` commands (e.g. for apt package management), then `/etc/sudoers` can
+# be modified (via `visudo`) to have an `env_keep` setting, e.g.:
+#
+#     Defaults env_keep = "http_proxy https_proxy ftp_proxy"
 function set-proxy-environ() {
   if [ $# -gt 2 ]; then
     echo "usage: ${FUNCNAME[0]} [proxy-url [no-proxy-hostname,no-proxy-hostname2,...]]" >&2
