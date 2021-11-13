@@ -1,6 +1,7 @@
 # Personal dotfiles
 
-_Everything here is provided "as is", without warranty of any kind._
+_Everything here is provided "as is" [under an MIT license](LICENSE), without
+warranty of any kind._
 
 ## Usage notes
 
