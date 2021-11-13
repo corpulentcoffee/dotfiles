@@ -1,6 +1,11 @@
 # shellcheck shell=bash
 # This is sourced from `.bash_aliases` under interactive bash; see notes there.
 
+export EDITOR=vi # safe fallback, even on BusyBox systems
+if command -v vim &>/dev/null; then
+  EDITOR=vim
+fi
+
 # Increase bash history size.
 HISTSIZE=100000
 HISTFILESIZE=500000
