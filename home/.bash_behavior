@@ -1,6 +1,16 @@
 # shellcheck shell=bash
 # This is sourced from `.bash_aliases` under interactive bash; see notes there.
 
+# Improve `less` paging. This affects all usage, but is motivated by git where
+# `FRX` is exported if `LESS` is not set (see `core.pager` on `man git-config`):
+#
+# - retain 'F' to avoid paging if there is less than one screenful of output
+# - add 'I' to enable case-insensitive searches by default
+# - retain 'R' allow color codes to work
+# - add 'S' to scroll long lines instead of wrapping
+# - drop 'X' to enable mouse and touchpad scrolling
+export LESS='FIRS'
+
 # Print status code after each command finishes. This checks `$?`, so it needs
 # to be the first thing executed on `$PROMPT_COMMAND`, so try to define this as
 # late as possible during shell initialization.
