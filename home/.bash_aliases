@@ -15,12 +15,21 @@ alias cd-dotfiles='cd "$(whereis-dotfiles)"'
 #   directory in the default file browser
 # - `open` with more than one argument runs `xdg-open` multiple times, once for
 #   each argument, to allow opening multiple files (or URLs) simultaneously
+#
+# Under WSL, expects a `wsl-open` wrapper script instead of `xdg-open`. There
+# are at least two implementations, e.g. <https://github.com/4U6U57/wsl-open>,
+# which can be `git clone`d and then symlinked into `~/bin` for this to work.
 function open() {
+  local opener=xdg-open
+  if [[ -v WSLENV ]]; then
+    opener=wsl-open
+  fi
+
   if [ $# -eq 0 ]; then
-    xdg-open .
+    "$opener" .
   else
     for arg in "$@"; do
-      xdg-open "$arg"
+      "$opener" "$arg"
     done
   fi
 }
