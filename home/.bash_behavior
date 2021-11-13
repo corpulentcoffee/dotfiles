@@ -20,6 +20,18 @@ HISTFILESIZE=500000
 # - drop 'X' to enable mouse and touchpad scrolling
 export LESS='FIRS'
 
+# Try to use `keychain` as an `ssh-agent` wrapper if we're running under WSL
+# without another SSH agent running. If any keys exist in `~/.ssh`, pass them as
+# positionals to `keychain`. This is usually already wired up on regular Ubuntu
+# by the desktop environment to the login user's keyring.
+if [[ -v WSLENV && ! -v SSH_AGENT_PID && ! -v SSH_AUTH_SOCK && -d ~/.ssh ]] &&
+  command -v keychain &>/dev/null; then
+  # shellcheck source=/dev/null
+  find ~/.ssh -name '*.pub' -prune -o -type f -name 'id_*' -print0 |
+    xargs -0 -- keychain --agents ssh -- &&
+    source "$HOME/.keychain/$HOSTNAME-sh"
+fi
+
 # Print status code after each command finishes. This checks `$?`, so it needs
 # to be the first thing executed on `$PROMPT_COMMAND`, so try to define this as
 # late as possible during shell initialization.
