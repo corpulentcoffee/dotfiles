@@ -20,6 +20,44 @@ HISTFILESIZE=500000
 # - drop 'X' to enable mouse and touchpad scrolling
 export LESS='FIRS'
 
+# Avail `nvm` and automatically activate Node environment as given by `.nvmrc`
+# files. `NVM_DIR` can be specified explicitly elsewhere, like machine-specific
+# not-version-controlled `~/.profile` file to make it visible higher in process
+# tree (e.g. to desktop environment apps), but elsewise will be automatically
+# detected and set here if nvm is in the normal place.
+if [[ ! -v NVM_DIR && -d ~/.nvm && -f ~/.nvm/nvm.sh ]]; then
+  export NVM_DIR=~/.nvm
+fi
+if [[ -d "$NVM_DIR" && -f "$NVM_DIR/nvm.sh" ]]; then
+  # `--no-use` avoids delay of activating `default` environment for new shells.
+  # shellcheck source=/dev/null
+  source "$NVM_DIR/nvm.sh" --no-use &&
+
+    # Explicitly call `nvm use` when `.nvmrc` is present or version it contains
+    # changes (due to, e.g., changing directories, moving git `HEAD`, altering
+    # contents manually). Calling `nvm use` explicitly also prints activated
+    # environment and the `.nvmrc` that triggered it. This is one of *many* ways
+    # to do this; see <https://github.com/nvm-sh/nvm#deeper-shell-integration>.
+    function __ccdotfiles_promptCommandNvmrc {
+      local nvmrc
+      nvmrc=$(nvm_find_nvmrc)
+
+      local version
+      [ -n "$nvmrc" ] && version=$(<"$nvmrc")
+
+      if [ -n "$version" ]; then
+        if [ "$version" != "$__ccdotfiles_promptCommandNvmrc_lastVersion" ]; then
+          nvm use
+          __ccdotfiles_promptCommandNvmrc_lastVersion=$version
+        fi
+      elif [ -n "$__ccdotfiles_promptCommandNvmrc_lastVersion" ]; then
+        nvm deactivate
+        unset __ccdotfiles_promptCommandNvmrc_lastVersion
+      fi
+    } &&
+      PROMPT_COMMAND="__ccdotfiles_promptCommandNvmrc; $PROMPT_COMMAND"
+fi
+
 # Try to use `keychain` as an `ssh-agent` wrapper if we're running under WSL
 # without another SSH agent running. If any keys exist in `~/.ssh`, pass them as
 # positionals to `keychain`. This is usually already wired up on regular Ubuntu
