@@ -139,6 +139,26 @@ if [ "${CODESPACES-false}" == "true" ]; then
   echo
 fi
 
+# WSL-specific installation tweaks
+if [[ -v WSLENV ]]; then
+  if [[ -d "/mnt/c/Users/$USER/AppData/Roaming/Code/User/" ]]; then
+    # Copy Linux VSCode configuration to Windows VSCode
+    (
+      cd .config/Code/User/
+      for file in *.json; do
+        echo "Copying $file to Windows VSCode..."
+
+        # shellcheck disable=SC2016
+        echo '// Not symlinked; do `cd-dotfiles && ./install.sh` to update' \
+          >"/mnt/c/Users/$USER/AppData/Roaming/Code/User/$file"
+
+        cat "$file" >>"/mnt/c/Users/$USER/AppData/Roaming/Code/User/$file"
+      done
+      echo
+    )
+  fi
+fi
+
 cat <<EOF
 Summary
 - already installed: $okayCount
