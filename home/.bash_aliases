@@ -53,6 +53,8 @@ alias npx='npx --no-install'
 # be modified (via `visudo`) to have an `env_keep` setting, e.g.:
 #
 #     Defaults env_keep = "http_proxy https_proxy ftp_proxy"
+#
+# Alternatively, `sudo -E` or `sudo --preserve-env` can accomplish similar.
 function set-proxy-environ() {
   if [ $# -gt 2 ]; then
     echo "usage: ${FUNCNAME[0]} [proxy-url [no-proxy-hostname,no-proxy-hostname2,...]]" >&2
