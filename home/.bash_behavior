@@ -91,11 +91,12 @@ function __ccdotfiles_promptCommandExitStatus {
 }
 PROMPT_COMMAND="__ccdotfiles_promptCommandExitStatus; $PROMPT_COMMAND"
 
-# Given a regular bash prompt ending in '$ ', if we have `__git_ps1` *or* it
-# appears that we *will* have it before the bash prompt gets displayed (as on
-# Ubuntu, as a sort of hack, where `/etc/bash_completion.d/git-prompt` sources
+# Given a regular bash prompt ending in '$ ' that doesn't already try to do
+# something git-related, if we have `__git_ps1` *or* it appears that we *will*
+# have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
 # `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here).
-if [[ $PS1 == *'\$ ' ]] &&
+# Some environments, like Codespaces, will provide their own fancy `PS1`.
+if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
   (
     command -v __git_ps1 &>/dev/null ||
       [ -f /etc/bash_completion.d/git-prompt ] && [ -f /usr/lib/git-core/git-sh-prompt ]
