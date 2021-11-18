@@ -74,6 +74,19 @@ if [[ -v WSLENV && ! -v SSH_AGENT_PID && ! -v SSH_AUTH_SOCK && -d ~/.ssh ]] &&
     source "$HOME/.keychain/$HOSTNAME-sh"
 fi
 
+# Given a regular bash prompt ending in '$ ' that doesn't already try to do
+# something git-related, if we have `__git_ps1` *or* it appears that we *will*
+# have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
+# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here).
+# Some environments, like Codespaces, will provide their own fancy `PS1`.
+if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
+  (
+    command -v __git_ps1 &>/dev/null ||
+      [ -f /etc/bash_completion.d/git-prompt ] && [ -f /usr/lib/git-core/git-sh-prompt ]
+  ); then
+  PS1=${PS1/%\\\$ /\$(GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1)\\\$ }
+fi
+
 # Print status code after each command finishes. This checks `$?`, so it needs
 # to be the first thing executed on `$PROMPT_COMMAND`, so try to define this as
 # late as possible during shell initialization.
@@ -90,16 +103,3 @@ function __ccdotfiles_promptCommandExitStatus {
   fi
 }
 PROMPT_COMMAND="__ccdotfiles_promptCommandExitStatus; $PROMPT_COMMAND"
-
-# Given a regular bash prompt ending in '$ ' that doesn't already try to do
-# something git-related, if we have `__git_ps1` *or* it appears that we *will*
-# have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
-# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here).
-# Some environments, like Codespaces, will provide their own fancy `PS1`.
-if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
-  (
-    command -v __git_ps1 &>/dev/null ||
-      [ -f /etc/bash_completion.d/git-prompt ] && [ -f /usr/lib/git-core/git-sh-prompt ]
-  ); then
-  PS1=${PS1/%\\\$ /\$(GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1)\\\$ }
-fi
