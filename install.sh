@@ -159,16 +159,27 @@ if [[ -v WSLENV ]]; then
   fi
 fi
 
-cat <<EOF
+if [[ -t 0 && -t 1 ]]; then    # stdin and stdout are both the terminal
+  readonly pager=${PAGER-less} # default to `less` if $PAGER not set at all
+else                           # in pipeline or redirection
+  readonly pager=''
+fi
+(
+  cat <<EOF
 Summary
 - already installed: $okayCount
 - failed to install: $failCount
 - needs reconciling: $copyCount
 - cleanly installed: $linkCount
+EOF
 
+  echo
+
+  cat <<'EOF'
 Hints
 - if this is a new/newish install, a logout/login cycle might be helpful
-  (e.g. for ~/.profile to see ~/bin and add it to the PATH)
+  (e.g. for ~/.profile to see ~/bin and add it to the $PATH)
 - you can run update-bash-completion for common tools that might be installed
 - you can run ./test.sh as a sanity check of the installation
 EOF
+) | ${pager:-cat}
