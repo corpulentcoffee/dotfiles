@@ -44,6 +44,14 @@ function open() {
   fi
 }
 
+# Returns proxy variables, like those set by `set-proxy-environ`, with masking
+# applied to any URLs using basic password auth.
+function print-masked-proxy-environ() {
+  printenv |
+    grep --ignore-case _proxy= |
+    sed --regexp-extended 's/:[^:@]+@/:***@/'
+}
+
 # Sets (or unsets) and then exports all variations of proxy-related environment
 # variables to try to maximize interoperability with different tools; see the
 # examples given in <https://unix.stackexchange.com/questions/212894> on why.
