@@ -3,6 +3,8 @@
  * available via a file system symlink. See dotfiles `install.sh`.
  */
 [
+  // Additional keybindings ////////////////////////////////////////////////////
+
   /** Open URLs or navigate between files */
   {
     "key": "alt+enter",
@@ -10,14 +12,49 @@
     "when": "editorFocus && !findWidgetVisible"
   },
 
-  /** Unneeded and conflicts w/ one of the "add cursor below" keybindings */
+  // Bring some of the default Linux keybindings to other platforms ////////////
+
+  {
+    "key": "ctrl+shift+alt+down",
+    "command": "editor.action.copyLinesDownAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+alt+up",
+    "command": "editor.action.copyLinesUpAction",
+    "when": "editorTextFocus && !editorReadonly"
+  },
+  {
+    "key": "ctrl+shift+down",
+    "command": "editor.action.insertCursorBelow",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "ctrl+shift+up",
+    "command": "editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+down",
+    "command": "editor.action.insertCursorBelow",
+    "when": "editorTextFocus"
+  },
+  {
+    "key": "shift+alt+up",
+    "command": "editor.action.insertCursorAbove",
+    "when": "editorTextFocus"
+  },
+
+  // Unneeded/unwanted keybindings from extensions /////////////////////////////
+
+  /** Conflicts w/ one of the "add cursor below" keybindings */
   {
     "key": "shift+alt+down",
     "command": "-markdown.extension.onCopyLineDown" /* yzhang.markdown-all-in-one */,
     "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
   },
 
-  /** Unneeded and conflicts w/ one of the "add cursor above" keybindings */
+  /** Conflicts w/ one of the "add cursor above" keybindings */
   {
     "key": "shift+alt+up",
     "command": "-markdown.extension.onCopyLineUp" /* yzhang.markdown-all-in-one */,
