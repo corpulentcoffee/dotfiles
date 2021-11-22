@@ -44,14 +44,6 @@ function open() {
   fi
 }
 
-# Returns proxy variables, like those set by `set-proxy-environ`, with masking
-# applied to any URLs using basic password auth.
-function print-masked-proxy-environ() {
-  printenv |
-    grep --ignore-case _proxy= |
-    sed --regexp-extended 's/:[^:@]+@/:***@/'
-}
-
 # Sets (or unsets) and then exports all variations of proxy-related environment
 # variables to try to maximize interoperability with different tools; see the
 # examples given in <https://unix.stackexchange.com/questions/212894> on why.
@@ -92,6 +84,17 @@ function set-proxy-environ() {
     unset ALL_PROXY FTP_PROXY HTTP_PROXY HTTPS_PROXY RSYNC_PROXY
   fi
 }
+
+# Inspect proxy variables, like those set by `set-proxy-environ`, from various
+# sources, with, by default, masking applied to URLs using basic password auth.
+alias show-docker-proxy-config='< ~/.docker/config.json sift-proxy-vars'
+alias show-docker-proxy-config-unmasked='< ~/.docker/config.json sift-proxy-vars-unmasked'
+alias show-docker-proxy-environ='docker run --rm alpine printenv | sift-proxy-vars'
+alias show-docker-proxy-environ-unmasked='docker run --rm alpine printenv | sift-proxy-vars-unmasked'
+alias show-local-proxy-environ='printenv | sift-proxy-vars'
+alias show-local-proxy-environ-unmasked='printenv | sift-proxy-vars-unmasked'
+alias sift-proxy-vars="sift-proxy-vars-unmasked | sed --regexp-extended 's/:[^:@]+@/:***@/'"
+alias sift-proxy-vars-unmasked="grep --color=never --extended-regexp --ignore-case '\b(all|ftp|https?|no|rsync)_?proxy\b'"
 
 # A standard Ubuntu `~/.bashrc` comes from `/etc/skel/.bashrc`, and will source
 # `~/.bash_aliases` if it exists and if the shell is interactive. Because it's
