@@ -1,6 +1,6 @@
 {
   "devDependencies": {
-    "pyright": "^1.1.192"
+    "pyright": "^1.1.193"
   },
   "private": true
 }
