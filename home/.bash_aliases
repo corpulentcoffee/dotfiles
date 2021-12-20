@@ -41,6 +41,7 @@ function open() {
   if [ $# -eq 0 ]; then
     "$opener" .
   else
+    local arg
     for arg in "$@"; do
       "$opener" "$arg"
     done
