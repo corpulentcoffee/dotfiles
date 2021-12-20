@@ -47,6 +47,39 @@ function open() {
   fi
 }
 
+# Open new terminal at given location(s); particularly useful from integrated
+# terminals (e.g. Visual Studio Code) to get to a full-sized windowed terminal.
+function open-terminal() {
+  local arg
+  for arg in "$@"; do
+    if [[ ! -d "$arg" ]]; then
+      echo "usage: ${FUNCNAME[0]} [directory [directory2 ...]]" >&2
+      return 1
+    fi
+  done
+
+  if [[ -v WSLENV ]]; then
+    # See <https://docs.microsoft.com/windows/terminal/command-line-arguments>.
+    # Switches to `/mnt/c` only to avoid `cmd.exe` whining about UNC paths.
+    local wslPath
+    if [[ $# -eq 0 ]]; then
+      wslPath=$(wslpath -w "$PWD")
+      (cd /mnt/c && cmd.exe /c wt.exe -d "$wslPath")
+    else
+      for arg in "$@"; do
+        wslPath=$(wslpath -w "$arg")
+        (cd /mnt/c && cmd.exe /c wt.exe -d "$wslPath")
+      done
+    fi
+  elif [[ $# -eq 0 ]]; then
+    x-terminal-emulator
+  else
+    for arg in "$@"; do
+      (cd "$arg" && x-terminal-emulator)
+    done
+  fi
+}
+
 # Sets (or unsets) and then exports all variations of proxy-related environment
 # variables to try to maximize interoperability with different tools; see the
 # examples given in <https://unix.stackexchange.com/questions/212894> on why.
