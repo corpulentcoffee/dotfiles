@@ -14,11 +14,12 @@ HISTFILESIZE=500000
 # `FRX` is exported if `LESS` is not set (see `core.pager` on `man git-config`):
 #
 # - retain 'F' to avoid paging if there is less than one screenful of output
-# - add 'I' to enable case-insensitive searches by default
+# - add 'i' to enable case-insensitive searches by default; uppercase letters in
+#   search string will trigger a case-sensitive search
 # - retain 'R' allow color codes to work
 # - add 'S' to scroll long lines instead of wrapping
 # - drop 'X' to enable mouse and touchpad scrolling
-export LESS='FIRS'
+export LESS='FiRS'
 
 # Avail `nvm` and automatically activate Node environment as given by `.nvmrc`
 # files. `NVM_DIR` can be specified explicitly elsewhere, like machine-specific
