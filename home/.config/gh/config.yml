@@ -15,6 +15,7 @@ aliases:
     co: pr checkout # this alias is shipped by default
     codespaces: codespace list
     configs: config list
+    clone: repo clone
     extensions: extension list
     gists: gist list
     gpg-keys: gpg-key list
