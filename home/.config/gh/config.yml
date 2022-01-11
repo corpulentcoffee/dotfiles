@@ -11,5 +11,19 @@ aliases:
     #
     # See <https://cli.github.com/manual/gh_alias_set> or `gh help alias set`
     # for additional examples.
+    aliases: alias list
     co: pr checkout # this alias is shipped by default
+    codespaces: codespace list
+    configs: config list
+    extensions: extension list
+    gists: gist list
+    gpg-keys: gpg-key list
+    issues: issue list
+    prs: pr list
     pv: pr view
+    releases: release list
+    repos: repo list
+    runs: run list
+    secrets: secret list
+    ssh-keys: ssh-key list
+    workflows: workflow list
