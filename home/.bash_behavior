@@ -1,6 +1,13 @@
 # shellcheck shell=bash
 # This is sourced from `.bash_aliases` under interactive bash; see notes there.
 
+# Interactive mode for incomplete `aws` commands (like `aws --cli-auto-prompt`).
+# In contrast to using Bash completion, incomplete commands that trigger the AWS
+# CLI interactive mode are added to Bash Readline history whereas the finalized
+# commands are added to the Readline history inside the interactive mode itself,
+# which can be seen via `jq .commands ~/.aws/cli/cache/prompt_history.json`.
+export AWS_CLI_AUTO_PROMPT=on-partial
+
 export EDITOR=vi # safe fallback, even on BusyBox systems
 if command -v vim &>/dev/null; then
   EDITOR=vim
