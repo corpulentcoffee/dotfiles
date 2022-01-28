@@ -27,4 +27,4 @@ if ! output=$("$sudo" "$fwupdmgr" refresh 2>&1); then
   fi
 fi
 
-"$sudo" "$fwupdmgr" upgrade
+exec "$sudo" "$fwupdmgr" upgrade

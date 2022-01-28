@@ -17,7 +17,7 @@ fi
 
 set -x
 
-docker run \
+exec docker run \
   --interactive \
   --mount "type=bind,source=${hostTrinoHome},destination=${guestTrinoHome}" \
   --rm \

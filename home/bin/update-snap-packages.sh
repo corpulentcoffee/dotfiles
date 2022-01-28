@@ -18,4 +18,4 @@ for command in "$snap" "$sudo"; do
   fi
 done
 
-"$sudo" "$snap" refresh
+exec "$sudo" "$snap" refresh

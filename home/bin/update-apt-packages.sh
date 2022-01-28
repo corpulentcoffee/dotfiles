@@ -18,4 +18,4 @@ for command in "$apt" "$sudo"; do
 done
 
 "$sudo" "$apt" update
-"$sudo" "$apt" upgrade
+exec "$sudo" "$apt" upgrade

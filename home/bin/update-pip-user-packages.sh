@@ -32,4 +32,4 @@ if ! [ "${#packages[@]}" -gt 0 ]; then
   exit 1
 fi
 
-"$pip" install --user --upgrade -- "${packages[@]}"
+exec "$pip" install --user --upgrade -- "${packages[@]}"

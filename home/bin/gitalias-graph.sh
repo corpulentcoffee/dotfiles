@@ -17,7 +17,7 @@ readonly subject='%C(white)%s%C(reset)'
 readonly authorName='%C(dim white)%an%C(reset)'
 readonly refNames='%C(bold red)%D%C(reset)'
 
-git log \
+exec git log \
   --format="$commitHash $authorDate $subject $authorName $refNames" \
   --graph \
   "$@"
