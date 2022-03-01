@@ -67,7 +67,7 @@ jobs:
       - uses: actions/checkout@v2
       - uses: actions/setup-python@v3
         with:
-          python-version: "3.8.5" # as on Ubuntu 20.04
+          python-version: "3.8" # as on Ubuntu 20.04
       - run: pip install appdirs black boto3 PyYAML simplejson
       - run: black --check .
       - run: npm ci # use whatever Node environment runner has; shouldn't matter
