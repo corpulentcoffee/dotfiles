@@ -12,39 +12,6 @@
     "when": "editorFocus && !findWidgetVisible"
   },
 
-  // Bring some of the default Linux keybindings to other platforms ////////////
-
-  {
-    "key": "ctrl+shift+alt+down",
-    "command": "editor.action.copyLinesDownAction",
-    "when": "editorTextFocus && !editorReadonly"
-  },
-  {
-    "key": "ctrl+shift+alt+up",
-    "command": "editor.action.copyLinesUpAction",
-    "when": "editorTextFocus && !editorReadonly"
-  },
-  {
-    "key": "ctrl+shift+down",
-    "command": "editor.action.insertCursorBelow",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "ctrl+shift+up",
-    "command": "editor.action.insertCursorAbove",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "shift+alt+down",
-    "command": "editor.action.insertCursorBelow",
-    "when": "editorTextFocus"
-  },
-  {
-    "key": "shift+alt+up",
-    "command": "editor.action.insertCursorAbove",
-    "when": "editorTextFocus"
-  },
-
   // Unneeded/unwanted keybindings from extensions /////////////////////////////
 
   /** Conflicts w/ one of the "add cursor below" keybindings */
