@@ -49,20 +49,7 @@ function open-terminal() {
     fi
   done
 
-  if [[ -v WSLENV ]]; then
-    # See <https://docs.microsoft.com/windows/terminal/command-line-arguments>.
-    # Switches to `/mnt/c` only to avoid `cmd.exe` whining about UNC paths.
-    local wslPath
-    if [[ $# -eq 0 ]]; then
-      wslPath=$(wslpath -w "$PWD")
-      (cd /mnt/c && cmd.exe /c wt.exe -d "$wslPath")
-    else
-      for arg in "$@"; do
-        wslPath=$(wslpath -w "$arg")
-        (cd /mnt/c && cmd.exe /c wt.exe -d "$wslPath")
-      done
-    fi
-  elif [[ $# -eq 0 ]]; then
+  if [[ $# -eq 0 ]]; then
     x-terminal-emulator
   else
     for arg in "$@"; do
