@@ -25,18 +25,8 @@ alias npx='npx --no-install'
 #   directory in the default file browser
 # - `open` with more than one argument runs `xdg-open` multiple times, once for
 #   each argument, to allow opening multiple files (or URLs) simultaneously
-#
-# Under WSL, expects a `wsl-open` wrapper script instead of `xdg-open`. There
-# are at least two implementations, e.g. <https://github.com/4U6U57/wsl-open>,
-# which can be `git clone`d and then symlinked into `~/bin` for this to work
-# (this particular sample `wsl-open` also features flags that wrap `xdg-mime`
-# and can manipulate `~/.mailcap` so that `xdg-open` itself could work on a WSL
-# with `xdg-utils` installed, but the `open` here doesn't rely on or use that).
 function open() {
   local opener=xdg-open
-  if [[ -v WSLENV ]]; then
-    opener=wsl-open
-  fi
 
   if [ $# -eq 0 ]; then
     "$opener" .
