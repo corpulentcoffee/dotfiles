@@ -28,7 +28,7 @@ def main() -> int:
     screenshot_files = []
 
     try:
-        for (i, save_file) in enumerate(settings.save_files):
+        for (i, save_file) in enumerate(settings.save_files, 1):
             screenshot_file = settings.screenshot_naming % i
             our_script = make_script(settings, screenshot_file)
             write_file_content(settings.script_file, our_script)
