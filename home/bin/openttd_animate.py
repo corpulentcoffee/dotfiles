@@ -13,8 +13,7 @@ from typing import List, NamedTuple, Optional
 class Settings(NamedTuple):
     ffmpeg_bin: str
     framerate: float
-    max_height: int
-    max_width: int
+    scale_output: Optional[str]
     openttd_bin: str
     output_file: str
     save_files: List[str]
@@ -137,16 +136,9 @@ def get_settings() -> Settings:
         default=0.5,
     )
     parser.add_argument(
-        "--max-width",
-        type=int,
-        help="limit output video resolution width; default %(default)s",
-        default=1024,
-    )
-    parser.add_argument(
-        "--max-height",
-        type=int,
-        help="limit output video resolution height; default %(default)s",
-        default=1024,
+        "--scale-output",
+        type=str,
+        help="scale output video resolution; can be a preset like ntsc or WxH",
     )
     parser.add_argument("first_save", metavar="first.sav")
     parser.add_argument("next_saves", metavar="next.sav", nargs="+")
@@ -159,8 +151,7 @@ def get_settings() -> Settings:
     return Settings(
         ffmpeg_bin=args.ffmpeg_bin,
         framerate=args.framerate,
-        max_height=args.max_height,
-        max_width=args.max_width,
+        scale_output=args.scale_output,
         openttd_bin=args.openttd_bin,
         output_file=args.output,
         save_files=save_files,
@@ -210,12 +201,14 @@ def generate_video(settings: Settings, screenshot_naming: str):
     from subprocess import run
 
     args = [  # see https://trac.ffmpeg.org/wiki/Slideshow
-        *["-framerate", str(settings.framerate)],
+        *["-r", "1"],  # framerate for the _input_ files
         *["-i", screenshot_naming],
-        *[
-            "-filter_complex",
-            f"scale=iw * min(1\\, min({settings.max_width}/iw\\, {settings.max_height}/ih)):-1",
-        ],
+        *["-r", str(settings.framerate)],  # framerate for the _output_ file
+        *(["-s", settings.scale_output] if settings.scale_output else []),
+        *["-c:v", "libx264"],  # video codec
+        "-an",  # no audio on output
+        *["-vsync", "cfr"],  # frames duplicated/dropped to achive framerate
+        *["-pix_fmt", "yuv420p"],  # better compatibility
         settings.output_file,
     ]
     run([settings.ffmpeg_bin, *args])
