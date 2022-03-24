@@ -15,6 +15,8 @@ class Settings(NamedTuple):
     framerate: float
     scale_output: Optional[str]
     openttd_bin: str
+    scroll_to: str
+    zoom_to: int
     output_file: str
     save_files: List[str]
     screenshot_naming: str
@@ -124,6 +126,17 @@ def get_settings() -> Settings:
         default="topography",
     )
     parser.add_argument(
+        "--zoom-to",
+        type=int,
+        choices=range(0, 10),
+        help="take screenshot at this zoom level",
+    )
+    parser.add_argument(
+        "--scroll-to",
+        type=str,
+        help="take screenshot at this map location using either 123,123 or 0x12AB format; you can get these from the land info tool",
+    )
+    parser.add_argument(
         "--output",
         metavar="output.mp4",
         help="video output file to write",
@@ -151,6 +164,8 @@ def get_settings() -> Settings:
     return Settings(
         ffmpeg_bin=args.ffmpeg_bin,
         framerate=args.framerate,
+        scroll_to=args.scroll_to,
+        zoom_to=args.zoom_to,
         scale_output=args.scale_output,
         openttd_bin=args.openttd_bin,
         output_file=args.output,
@@ -177,13 +192,22 @@ def get_temp_file_prefix(dir: str) -> str:
 
 def make_script(settings: Settings, screenshot_file: str) -> str:
     from pathlib import Path
-    from textwrap import dedent
 
-    script = f"""
-        screenshot {settings.screenshot_type} "{Path(screenshot_file).stem}"
-        exit
-    """
-    return dedent(script).strip()
+    script = []
+    if settings.scroll_to:
+        script.append("zoomto 0")
+        script.append(
+            f"scrollto instant {settings.scroll_to.replace(',', ' ')}"
+        )
+        script.append(f"zoomto {settings.zoom_to or 3}")
+    elif settings.zoom_to:
+        script.append(f"zoomto {settings.zoom_to}")
+    script.append(
+        f'screenshot {settings.screenshot_type} "{Path(screenshot_file).stem}"'
+    )
+    script.append("exit")
+
+    return "\n".join(script)
 
 
 def write_file_content(path: str, content: str):
