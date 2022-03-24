@@ -13,9 +13,10 @@ from typing import List, NamedTuple, Optional
 class Settings(NamedTuple):
     ffmpeg_bin: str
     framerate: float
-    max_height: int
-    max_width: int
+    scale_output: Optional[str]
     openttd_bin: str
+    scroll_to: str
+    zoom_to: int
     output_file: str
     save_files: List[str]
     screenshot_naming: str
@@ -29,7 +30,7 @@ def main() -> int:
     screenshot_files = []
 
     try:
-        for (i, save_file) in enumerate(settings.save_files):
+        for (i, save_file) in enumerate(settings.save_files, 1):
             screenshot_file = settings.screenshot_naming % i
             our_script = make_script(settings, screenshot_file)
             write_file_content(settings.script_file, our_script)
@@ -106,11 +107,6 @@ def get_settings() -> Settings:
     parser.add_argument(
         "--type",
         choices=[
-            # Although you can script `scrollto`, there's no "`zoomto`", so
-            # some of these are of limited use in a video... an alternative
-            # might be to use `convert` or PIL on the individual screenshots to
-            # do zooming and cropping (which would replace `-filter_complex` in
-            # `generate_video()` below and probably get a better result).
             "big",
             "giant",
             "heightmap",
@@ -125,6 +121,20 @@ def get_settings() -> Settings:
         default="topography",
     )
     parser.add_argument(
+        "--zoom-to",
+        type=int,
+        choices=range(0, 10),
+        help="take screenshot at this zoom level",
+    )
+    parser.add_argument(
+        "--scroll-to",
+        type=str,
+        help="""
+            take screenshot at this map location using either 123,123 or 0x12AB
+            format; you can get these from the land info tool
+        """,
+    )
+    parser.add_argument(
         "--output",
         metavar="output.mp4",
         help="video output file to write",
@@ -137,16 +147,9 @@ def get_settings() -> Settings:
         default=0.5,
     )
     parser.add_argument(
-        "--max-width",
-        type=int,
-        help="limit output video resolution width; default %(default)s",
-        default=1024,
-    )
-    parser.add_argument(
-        "--max-height",
-        type=int,
-        help="limit output video resolution height; default %(default)s",
-        default=1024,
+        "--scale-output",
+        type=str,
+        help="scale output video resolution; can be a preset like ntsc or WxH",
     )
     parser.add_argument("first_save", metavar="first.sav")
     parser.add_argument("next_saves", metavar="next.sav", nargs="+")
@@ -159,8 +162,9 @@ def get_settings() -> Settings:
     return Settings(
         ffmpeg_bin=args.ffmpeg_bin,
         framerate=args.framerate,
-        max_height=args.max_height,
-        max_width=args.max_width,
+        scroll_to=args.scroll_to,
+        zoom_to=args.zoom_to,
+        scale_output=args.scale_output,
         openttd_bin=args.openttd_bin,
         output_file=args.output,
         save_files=save_files,
@@ -186,13 +190,22 @@ def get_temp_file_prefix(dir: str) -> str:
 
 def make_script(settings: Settings, screenshot_file: str) -> str:
     from pathlib import Path
-    from textwrap import dedent
 
-    script = f"""
-        screenshot {settings.screenshot_type} "{Path(screenshot_file).stem}"
-        exit
-    """
-    return dedent(script).strip()
+    script = []
+    if settings.scroll_to:
+        script.append("zoomto 0")
+        script.append(
+            f"scrollto instant {settings.scroll_to.replace(',', ' ')}"
+        )
+        script.append(f"zoomto {settings.zoom_to or 3}")
+    elif settings.zoom_to:
+        script.append(f"zoomto {settings.zoom_to}")
+    script.append(
+        f'screenshot {settings.screenshot_type} "{Path(screenshot_file).stem}"'
+    )
+    script.append("exit")
+
+    return "\n".join(script)
 
 
 def write_file_content(path: str, content: str):
@@ -210,12 +223,21 @@ def generate_video(settings: Settings, screenshot_naming: str):
     from subprocess import run
 
     args = [  # see https://trac.ffmpeg.org/wiki/Slideshow
-        *["-framerate", str(settings.framerate)],
+        *["-r", "1"],  # framerate for the _input_ files
         *["-i", screenshot_naming],
-        *[
-            "-filter_complex",
-            f"scale=iw * min(1\\, min({settings.max_width}/iw\\, {settings.max_height}/ih)):-1",
-        ],
+        *["-r", str(settings.framerate)],  # framerate for the _output_ file
+        *(
+            ["-s", settings.scale_output]
+            if settings.scale_output
+            else [  # libx264 needs even width/height
+                "-vf",
+                "crop=trunc(iw/2)*2:trunc(ih/2)*2",
+            ]
+        ),
+        *["-c:v", "libx264"],  # video codec
+        "-an",  # no audio on output
+        *["-vsync", "cfr"],  # frames duplicated/dropped to achive framerate
+        *["-pix_fmt", "yuv420p"],  # better compatibility
         settings.output_file,
     ]
     run([settings.ffmpeg_bin, *args])
