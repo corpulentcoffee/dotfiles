@@ -134,7 +134,10 @@ def get_settings() -> Settings:
     parser.add_argument(
         "--scroll-to",
         type=str,
-        help="take screenshot at this map location using either 123,123 or 0x12AB format; you can get these from the land info tool",
+        help="""
+            take screenshot at this map location using either 123,123 or 0x12AB
+            format; you can get these from the land info tool
+        """,
     )
     parser.add_argument(
         "--output",
