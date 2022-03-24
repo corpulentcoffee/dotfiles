@@ -204,7 +204,14 @@ def generate_video(settings: Settings, screenshot_naming: str):
         *["-r", "1"],  # framerate for the _input_ files
         *["-i", screenshot_naming],
         *["-r", str(settings.framerate)],  # framerate for the _output_ file
-        *(["-s", settings.scale_output] if settings.scale_output else []),
+        *(
+            ["-s", settings.scale_output]
+            if settings.scale_output
+            else [  # libx264 needs even width/height
+                "-vf",
+                "crop=trunc(iw/2)*2:trunc(ih/2)*2",
+            ]
+        ),
         *["-c:v", "libx264"],  # video codec
         "-an",  # no audio on output
         *["-vsync", "cfr"],  # frames duplicated/dropped to achive framerate
