@@ -107,11 +107,6 @@ def get_settings() -> Settings:
     parser.add_argument(
         "--type",
         choices=[
-            # Although you can script `scrollto`, there's no "`zoomto`", so
-            # some of these are of limited use in a video... an alternative
-            # might be to use `convert` or PIL on the individual screenshots to
-            # do zooming and cropping (which would replace `-filter_complex` in
-            # `generate_video()` below and probably get a better result).
             "big",
             "giant",
             "heightmap",
