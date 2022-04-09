@@ -4,6 +4,14 @@
 # checks. Each command here is printed (`set -x`) and the script will exit
 # if something goes wrong (`set -euETo pipefail`, `shopt -s inherit_errexit`).
 
+case "$BASH_VERSION" in # see also same check in `install.sh`
+5.*) ;;
+*)
+  echo "expecting bash 5.x but got '${BASH_VERSION}'; cautiously exiting" >&2
+  exit 1
+  ;;
+esac
+
 set -euETo pipefail
 shopt -s inherit_errexit
 
