@@ -27,8 +27,8 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
-# On at least Ubuntu 20.04, `/usr/share/bash-completion/bash_completion` is
-# capable of picking up user completions in two different places:
+# On at least Ubuntu 20.04 + 22.04, `/usr/share/bash-completion/bash_completion`
+# is capable of picking up user completions in two different places:
 #
 # - a directory called `~/.local/share/bash-completion/completions` (or
 #   `$XDG_DATA_HOME/bash-completion/completions` if `$XDG_DATA_HOME` is set),
