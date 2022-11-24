@@ -26,5 +26,12 @@
     "key": "shift+alt+up",
     "command": "-markdown.extension.onCopyLineUp" /* yzhang.markdown-all-in-one */,
     "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+  },
+
+  /** Keybinding commonly overloaded; prefer `Insert` instead */
+  {
+    "key": "ctrl+shift+i",
+    "command": "-overtype.toggle",
+    "when": "editorFocus"
   }
 ]
