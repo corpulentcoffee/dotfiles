@@ -45,6 +45,10 @@
 
   "javascript.updateImportsOnFileMove.enabled": "always",
 
+  // `overtype` settings use the Overtype extension (`drmerfy.overtype`).
+  "overtype.paste": true,
+  "overtype.perEditor": true,
+
   // `python` settings use Microsoft's Python extension (`ms-python.python`) or
   // its Pylance dependency (`ms-python.vscode-pylance`).
   "python.analysis.typeCheckingMode": "strict",
