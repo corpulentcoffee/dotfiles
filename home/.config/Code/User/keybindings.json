@@ -33,5 +33,11 @@
     "key": "ctrl+shift+i",
     "command": "-overtype.toggle",
     "when": "editorFocus"
+  },
+
+  /** Conflicts w/ Readline end-of-line keybinding; prefer `Ctrl`+`P` instead */
+  {
+    "key": "ctrl+e",
+    "command": "-workbench.action.quickOpen"
   }
 ]
