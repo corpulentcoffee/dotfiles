@@ -17,16 +17,20 @@ fi
 HISTSIZE=100000
 HISTFILESIZE=500000
 
-# Improve `less` paging. This affects all usage, but is motivated by git where
-# `FRX` is exported if `LESS` is not set (see `core.pager` on `man git-config`):
-#
-# - retain 'F' to avoid paging if there is less than one screenful of output
-# - add 'i' to enable case-insensitive searches by default; uppercase letters in
-#   search string will trigger a case-sensitive search
-# - retain 'R' allow color codes to work
-# - add 'S' to scroll long lines instead of wrapping
-# - drop 'X' to enable mouse and touchpad scrolling
-export LESS='FiRS'
+# Improve `less` paging. In `git` operations, `FRX` (`--quit-if-one-screen`,
+# `--RAW-CONTROL-CHARS`, and `--no-init`) is exported if `LESS` is not set (see
+# notes for `core.pager` on `man git-config`).
+__ccdotfiles_less=(
+  --chop-long-lines # must scroll horizontally to see remainder of long lines
+  --ignore-case     # can use uppercase in pattern for a case sensitive search
+  --LONG-PROMPT     # see visible line numbers and, if known, total line count
+  --mouse           # needed if using `--no-init` to keep mouse/trackpad working
+  --no-init         # do not clear screen before and after pager usage
+  --quit-if-one-screen
+  --RAW-CONTROL-CHARS
+)
+export LESS="${__ccdotfiles_less[*]}"
+unset __ccdotfiles_less
 
 # Avail `nvm` and automatically activate Node environment as given by `.nvmrc`
 # files. `NVM_DIR` can be specified explicitly elsewhere, like machine-specific
