@@ -22,10 +22,10 @@ HISTFILESIZE=500000
 # notes for `core.pager` on `man git-config`).
 __ccdotfiles_less=(
   --chop-long-lines # must scroll horizontally to see remainder of long lines
-  --ignore-case     # can use uppercase in pattern for a case sensitive search
+  --ignore-case     # can use uppercase in pattern for a case-sensitive search
   --LONG-PROMPT     # see visible line numbers and, if known, total line count
-  --mouse           # needed if using `--no-init` to keep mouse/trackpad working
-  --no-init         # do not clear screen before and after pager usage
+  # --mouse         # scrollwheel under `--no-init`, but breaks text selection
+  # --no-init       # do not clear screen before and after pager usage
   --quit-if-one-screen
   --RAW-CONTROL-CHARS
 )
