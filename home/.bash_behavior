@@ -77,14 +77,22 @@ fi
 # Given a regular bash prompt ending in '$ ' that doesn't already try to do
 # something git-related, if we have `__git_ps1` *or* it appears that we *will*
 # have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
-# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here).
+# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here),
+# call out to include git info in the prompt whenever in a repository and also
+# change the appearance of the trailing '$ ' to differentiate from the git info.
 # Some environments, like Codespaces, will provide their own fancy `PS1`.
 if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
   (
     command -v __git_ps1 &>/dev/null ||
       [ -f /etc/bash_completion.d/git-prompt ] && [ -f /usr/lib/git-core/git-sh-prompt ]
   ); then
-  PS1=${PS1/%\\\$ /\$(GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1)\\\$ }
+  function __ccdotfiles_ps1Git {
+    if command -v __git_ps1 &>/dev/null; then
+      GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 \
+        GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1 ' %s'
+    fi
+  }
+  PS1=${PS1/%'\$ '/'\[\e[1;33m\]'\$(__ccdotfiles_ps1Git)'\[\e[3;37m\]\$\[\e[0m\] '}
 fi
 
 # Print exit code after each command. This checks `$?`, so it needs to be first
