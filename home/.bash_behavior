@@ -74,6 +74,26 @@ if [[ ! -v CODESPACES ]]; then
   fi
 fi
 
+# Perform enhancements to the `PS1` bash prompt. Hints and suggestions:
+#
+# - avoid newlines, e.g.: `less` with `--quit-if-one-screen` assumes prompt that
+#   follows won't be multiline, and similarly, if using `--no-init` to avoid
+#   clearing the screen, the first line of on-screen text would be scrolled away
+#   if prompt is multiline
+# - when using escape sequences, start these with `\[` and end with `\]` so the
+#   width of the prompt is correctly calculated and navigation keys (e.g. up,
+#   down, home) behave properly
+#   - such delimitation needs to be in the PS1 itself; doing it inside of a
+#     variable or in command output substitution won't work
+# - try to avoid using `PROMPT_COMMAND`
+#   - reading variables like `PIPESTATUS` from a `PROMPT_COMMAND` might not work
+#     when using tools that insert themselves into the `PROMPT_COMMAND`, like
+#     Visual Studio Code's terminal integration features
+#   - similarly, some people like building the `PS1` string from scratch each
+#     time before display using a `PROMPT_COMMAND`, but doing this can clobber
+#     helpful information set by some tools, e.g. Python `virtualenv` activation
+#     prepends onto the `PS1` variable
+
 # Given a regular bash prompt ending in '$ ' that doesn't already try to do
 # something git-related, if we have `__git_ps1` *or* it appears that we *will*
 # have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
