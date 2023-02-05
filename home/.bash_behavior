@@ -93,6 +93,8 @@ fi
 #     time before display using a `PROMPT_COMMAND`, but doing this can clobber
 #     helpful information set by some tools, e.g. Python `virtualenv` activation
 #     prepends onto the `PS1` variable
+# - some environments, like Codespaces, will provide their own fancy `PS1`, so
+#   sniffing for things before adding them can sometimes prevent duplication
 
 # Given a regular bash prompt ending in '$ ' that doesn't already try to do
 # something git-related, if we have `__git_ps1` *or* it appears that we *will*
@@ -100,7 +102,6 @@ fi
 # `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here),
 # call out to include git info in the prompt whenever in a repository and also
 # change the appearance of the trailing '$ ' to differentiate from the git info.
-# Some environments, like Codespaces, will provide their own fancy `PS1`.
 if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
   (
     command -v __git_ps1 &>/dev/null ||
