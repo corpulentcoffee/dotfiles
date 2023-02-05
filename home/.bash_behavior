@@ -74,29 +74,54 @@ if [[ ! -v CODESPACES ]]; then
   fi
 fi
 
+# Perform enhancements to the `PS1` bash prompt. Hints and suggestions:
+#
+# - avoid newlines, e.g.: `less` with `--quit-if-one-screen` assumes prompt that
+#   follows won't be multiline, and similarly, if using `--no-init` to avoid
+#   clearing the screen, the first line of on-screen text would be scrolled away
+#   if prompt is multiline
+# - when using escape sequences, start these with `\[` and end with `\]` so the
+#   width of the prompt is correctly calculated and navigation keys (e.g. up,
+#   down, home) behave properly
+#   - such delimitation needs to be in the PS1 itself; doing it inside of a
+#     variable or in command output substitution won't work
+# - try to avoid using `PROMPT_COMMAND`
+#   - reading variables like `PIPESTATUS` from a `PROMPT_COMMAND` might not work
+#     when using tools that insert themselves into the `PROMPT_COMMAND`, like
+#     Visual Studio Code's terminal integration features
+#   - similarly, some people like building the `PS1` string from scratch each
+#     time before display using a `PROMPT_COMMAND`, but doing this can clobber
+#     helpful information set by some tools, e.g. Python `virtualenv` activation
+#     prepends onto the `PS1` variable
+# - some environments, like Codespaces, will provide their own fancy `PS1`, so
+#   sniffing for things before adding them can sometimes prevent duplication
+
 # Given a regular bash prompt ending in '$ ' that doesn't already try to do
 # something git-related, if we have `__git_ps1` *or* it appears that we *will*
 # have it (as on Ubuntu, where `/etc/bash_completion.d/git-prompt` sources
-# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here).
-# Some environments, like Codespaces, will provide their own fancy `PS1`.
+# `/usr/lib/git-core/git-sh-prompt`, which happens later after we're done here),
+# call out to include git info in the prompt whenever in a repository and also
+# change the appearance of the trailing '$ ' to differentiate from the git info.
 if [[ $PS1 == *'\$ ' && $PS1 != *'git'* ]] &&
   (
     command -v __git_ps1 &>/dev/null ||
       [ -f /etc/bash_completion.d/git-prompt ] && [ -f /usr/lib/git-core/git-sh-prompt ]
   ); then
-  PS1=${PS1/%\\\$ /\$(GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1)\\\$ }
+  function __ccdotfiles_ps1Git {
+    if command -v __git_ps1 &>/dev/null; then
+      GIT_PS1_SHOWDIRTYSTATE=1 GIT_PS1_SHOWSTASHSTATE=1 \
+        GIT_PS1_SHOWUNTRACKEDFILES=1 GIT_PS1_SHOWUPSTREAM=auto __git_ps1 ' %s'
+    fi
+  }
+  PS1=${PS1/%'\$ '/'\[\e[1;33m\]'\$(__ccdotfiles_ps1Git)'\[\e[3;37m\]\$\[\e[0m\] '}
 fi
 
-# Print exit code after each command. This checks `$?`, so it needs to be first
-# in `$PROMPT_COMMAND`, thus try to define this as late as possible during shell
-# setup. Avoid writing newlines here to be friendly to pagers, e.g.: `less` with
-# `--quit-if-one-screen` assumes prompt that follows won't be multiline, and
-# similarly, if using `--no-init` to avoid clearing the screen, the first line
-# of on-screen text would be scrolled away if prompt is multiline.
-function __ccdotfiles_promptCommandExitStatus {
-  local status=$?
-  if [ "$status" != 0 ]; then
-    echo -en "\\e[0;41m exit $status \\e[0m "
+# Include exit status at the beginning of the prompt. If most recent command was
+# a pipeline, display the exit statuses of the individual processes.
+function __ccdotfiles_ps1Exit {
+  local statuses="${PIPESTATUS[*]}"
+  if ! [[ $statuses =~ ^0( 0)*$ ]]; then
+    echo "${statuses// /│} "
   fi
 }
-PROMPT_COMMAND="__ccdotfiles_promptCommandExitStatus; $PROMPT_COMMAND"
+PS1='\[\e[1;91m\]$(__ccdotfiles_ps1Exit)\[\e[0m\]'"$PS1"
