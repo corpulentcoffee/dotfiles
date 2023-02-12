@@ -147,6 +147,15 @@ if [ "${CODESPACES-false}" == "true" ]; then
   echo
 fi
 
+# Bash will truncate history immediately upon assignment, even if number is
+# adjusted upward later by `~/.bash_behavior`, so comment out such assignments
+# in `~/.bashrc` if we see them.
+if grep -qE '^HIST(FILE)?SIZE=[0-9]+' ~/.bashrc; then
+  echo 'Commenting out history size variables in ~/.bashrc'
+  sed -Ei 's/^(HIST(FILE)?SIZE=[0-9]+)/# \1/' ~/.bashrc
+  echo
+fi
+
 if [[ -t 0 && -t 1 ]]; then    # stdin and stdout are both the terminal
   readonly pager=${PAGER-less} # default to `less` if $PAGER not set at all
 else                           # in pipeline or redirection
