@@ -21,6 +21,11 @@ warranty of any kind._
     extension; additionally, Python scripts are symlinked in kebab case (which
     is easier to type) rather than the in-repository snake case (which is
     `import`able)
+- many environments ship their own `~/.bashrc` with environment-specific items
+  and interoperability with those setups is done by not including `home/.bashrc`
+  here but rather relying on the fact that most `~/.bashrc` files will source
+  `~/.bash_aliases` if it exists, which _is_ included here; the `install.sh`
+  setup script can make minor tweaks to environment-provided `~/.bashrc` files
 - some items assume the presence of other things (e.g. a script might assume
   that certain `.gitconfig` aliases are configured or that another script can be
   called using its installed name), so partial installs might not work without
