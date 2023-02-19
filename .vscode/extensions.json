@@ -1,6 +1,6 @@
 /**
  * These extensions are generally used by global defaults in the home-installed
- * `../home/.config/Code/User/settings.json`, so all of them should probably be
+ * `../home/.config/Code/User/` preferences, so all of them should probably be
  * enabled globally in Visual Studio Code.
  */
 {
