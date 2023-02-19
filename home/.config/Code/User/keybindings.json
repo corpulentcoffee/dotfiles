@@ -26,20 +26,6 @@
     "command": "-markdown.extension.editing.toggleHeadingUp" /* yzhang.markdown-all-in-one */
   },
 
-  /** Conflicts w/ one of the "add cursor below" keybindings */
-  {
-    "key": "shift+alt+down",
-    "command": "-markdown.extension.onCopyLineDown" /* yzhang.markdown-all-in-one */,
-    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
-  },
-
-  /** Conflicts w/ one of the "add cursor above" keybindings */
-  {
-    "key": "shift+alt+up",
-    "command": "-markdown.extension.onCopyLineUp" /* yzhang.markdown-all-in-one */,
-    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
-  },
-
   /** Keybinding commonly overloaded; prefer `Insert` instead */
   {
     "key": "ctrl+shift+i",
