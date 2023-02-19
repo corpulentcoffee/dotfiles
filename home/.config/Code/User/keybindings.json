@@ -12,6 +12,22 @@
     "when": "editorFocus && !findWidgetVisible"
   },
 
+  /** Go to next fold; complements `Alt`+`]` (go to next suggestion) and
+      `Ctrl`+`Shift`+`]` (unfold) */
+  {
+    "key": "shift+alt+]",
+    "command": "editor.gotoNextFold",
+    "when": "editorTextFocus && foldingEnabled"
+  },
+
+  /** Go to previous fold; complements `Alt`+`[` (go to previous suggestion) and
+      `Ctrl`+`Shift`+`[` (fold) */
+  {
+    "key": "shift+alt+[",
+    "command": "editor.gotoPreviousFold",
+    "when": "editorTextFocus && foldingEnabled"
+  },
+
   // Unneeded/unwanted keybindings from extensions /////////////////////////////
 
   /** Conflicts w/ fold keybinding */
