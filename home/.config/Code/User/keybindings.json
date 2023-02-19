@@ -14,6 +14,18 @@
 
   // Unneeded/unwanted keybindings from extensions /////////////////////////////
 
+  /** Conflicts w/ fold keybinding */
+  {
+    "key": "ctrl+shift+[",
+    "command": "-markdown.extension.editing.toggleHeadingDown" /* yzhang.markdown-all-in-one */
+  },
+
+  /** Conflicts w/ unfold keybinding */
+  {
+    "key": "ctrl+shift+]",
+    "command": "-markdown.extension.editing.toggleHeadingUp" /* yzhang.markdown-all-in-one */
+  },
+
   /** Conflicts w/ one of the "add cursor below" keybindings */
   {
     "key": "shift+alt+down",
