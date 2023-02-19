@@ -17,20 +17,19 @@
   /** Conflicts w/ fold keybinding */
   {
     "key": "ctrl+shift+[",
-    "command": "-markdown.extension.editing.toggleHeadingDown" /* yzhang.markdown-all-in-one */
+    "command": "-markdown.extension.editing.toggleHeadingDown" /* from `yzhang.markdown-all-in-one` */
   },
 
   /** Conflicts w/ unfold keybinding */
   {
     "key": "ctrl+shift+]",
-    "command": "-markdown.extension.editing.toggleHeadingUp" /* yzhang.markdown-all-in-one */
+    "command": "-markdown.extension.editing.toggleHeadingUp" /* from `yzhang.markdown-all-in-one` */
   },
 
   /** Keybinding commonly overloaded; prefer `Insert` instead */
   {
     "key": "ctrl+shift+i",
-    "command": "-overtype.toggle",
-    "when": "editorFocus"
+    "command": "-overtype.toggle" /* from `drmerfy.overtype` */
   },
 
   /** Conflicts w/ Readline end-of-line keybinding; prefer `Ctrl`+`P` instead */
