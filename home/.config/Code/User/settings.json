@@ -59,9 +59,9 @@
 
   // `python` settings use Microsoft's Python extension (`ms-python.python`) or
   // its Pylance dependency (`ms-python.vscode-pylance`).
-  "python.analysis.inlayHints.variableTypes": true,
-  "python.analysis.inlayHints.pytestParameters": true,
   "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.typeCheckingMode": "strict",
   "python.formatting.provider":
     /**
