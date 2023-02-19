@@ -35,7 +35,10 @@
   "editor.tabSize": 2,
 
   "isort.args": [
-    /** see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort */
+    /**
+     * @see python.formatting.provider below
+     * @see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
+     */
     "--profile=black"
   ],
 
@@ -61,7 +64,10 @@
   "python.analysis.inlayHints.functionReturnTypes": true,
   "python.analysis.typeCheckingMode": "strict",
   "python.formatting.provider":
-    /** Needs a local Black install, like via apt or `pip3 install --user`. */
+    /**
+     * Needs a local Black install, like via apt or `pip3 install --user`.
+     * @see isort.args for compatibility purposes
+     */
     "black",
   "python.languageServer": "Pylance",
 
