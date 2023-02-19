@@ -26,13 +26,21 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  "editor.inlayHints.enabled": true,
+  "editor.inlayHints.enabled": "onUnlessPressed",
   "editor.inlayHints.fontFamily": "sans",
   "editor.inlayHints.fontSize": 10,
   "editor.renderControlCharacters": true,
   "editor.renderWhitespace": "all",
   "editor.rulers": [80],
   "editor.tabSize": 2,
+
+  "isort.args": [
+    /**
+     * @see python.formatting.provider below
+     * @see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort
+     */
+    "--profile=black"
+  ],
 
   // see also `typescript.inlayHints` settings below
   "javascript.inlayHints.enumMemberValues.enabled": true,
@@ -51,21 +59,25 @@
 
   // `python` settings use Microsoft's Python extension (`ms-python.python`) or
   // its Pylance dependency (`ms-python.vscode-pylance`).
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.typeCheckingMode": "strict",
   "python.formatting.provider":
-    /** Needs a local Black install, like via apt or `pip3 install --user`. */
+    /**
+     * Needs a local Black install, like via apt or `pip3 install --user`.
+     * @see isort.args for compatibility purposes
+     */
     "black",
   "python.languageServer": "Pylance",
-  "python.sortImports.args": [
-    /** see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort */
-    "--profile=black"
-  ],
 
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
   /** @deprecated by `telemetryLevel` */ "telemetry.enableTelemetry": false,
   "telemetry.telemetryLevel": "off",
 
   "terminal.integrated.allowChords": false,
+  "terminal.integrated.enablePersistentSessions": false,
+  "terminal.integrated.minimumContrastRatio": 1 /* allows dim ANSI colors */,
   "terminal.integrated.tabs.enabled": true,
   "terminal.integrated.tabs.focusMode": "singleClick",
 

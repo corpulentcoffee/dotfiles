@@ -12,27 +12,40 @@
     "when": "editorFocus && !findWidgetVisible"
   },
 
-  // Unneeded/unwanted keybindings from extensions /////////////////////////////
-
-  /** Conflicts w/ one of the "add cursor below" keybindings */
+  /** Go to next fold; complements `Alt`+`]` (go to next suggestion) and
+      `Ctrl`+`Shift`+`]` (unfold) */
   {
-    "key": "shift+alt+down",
-    "command": "-markdown.extension.onCopyLineDown" /* yzhang.markdown-all-in-one */,
-    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+    "key": "shift+alt+]",
+    "command": "editor.gotoNextFold",
+    "when": "editorTextFocus && foldingEnabled"
   },
 
-  /** Conflicts w/ one of the "add cursor above" keybindings */
+  /** Go to previous fold; complements `Alt`+`[` (go to previous suggestion) and
+      `Ctrl`+`Shift`+`[` (fold) */
   {
-    "key": "shift+alt+up",
-    "command": "-markdown.extension.onCopyLineUp" /* yzhang.markdown-all-in-one */,
-    "when": "editorTextFocus && !editorReadonly && !suggestWidgetVisible && editorLangId == 'markdown'"
+    "key": "shift+alt+[",
+    "command": "editor.gotoPreviousFold",
+    "when": "editorTextFocus && foldingEnabled"
+  },
+
+  // Unneeded/unwanted keybindings from extensions /////////////////////////////
+
+  /** Conflicts w/ fold keybinding */
+  {
+    "key": "ctrl+shift+[",
+    "command": "-markdown.extension.editing.toggleHeadingDown" /* from `yzhang.markdown-all-in-one` */
+  },
+
+  /** Conflicts w/ unfold keybinding */
+  {
+    "key": "ctrl+shift+]",
+    "command": "-markdown.extension.editing.toggleHeadingUp" /* from `yzhang.markdown-all-in-one` */
   },
 
   /** Keybinding commonly overloaded; prefer `Insert` instead */
   {
     "key": "ctrl+shift+i",
-    "command": "-overtype.toggle",
-    "when": "editorFocus"
+    "command": "-overtype.toggle" /* from `drmerfy.overtype` */
   },
 
   /** Conflicts w/ Readline end-of-line keybinding; prefer `Ctrl`+`P` instead */

@@ -1,12 +1,12 @@
 /**
  * These extensions are generally used by global defaults in the home-installed
- * `../home/.config/Code/User/settings.json`, so all of them should probably be
+ * `../home/.config/Code/User/` preferences, so all of them should probably be
  * enabled globally in Visual Studio Code.
  */
 {
   "recommendations": [
     /** Avail an overtype mode that is togglable by the `Insert` key. */
-    "drmerfy.overtype",
+    "drmerfy.overtype" /* was `adammaras.overtype`, but that's now abandoned */,
 
     /**
      * Provide autoformatting for markdown, JSON, YAML, and some others. See
@@ -19,9 +19,9 @@
 
     /**
      * Autoformatting, typechecking and more. Automatically enables Pyright by
-     * installing the `ms-python.vscode-pylance` extension. The Python extension
-     * will also install some other Jupyter-related extensions, but those can be
-     * disabled without affecting the Python functionality.
+     * installing the `ms-python.vscode-pylance` extension and import sorting w/
+     * the `ms-python.isort` extension. This also installs some Jupyter-related
+     * extensions, but those can be disabled w/o affecting Python functionality.
      */
     "ms-python.python",
 
