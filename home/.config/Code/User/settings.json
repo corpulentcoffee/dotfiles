@@ -34,6 +34,11 @@
   "editor.rulers": [80],
   "editor.tabSize": 2,
 
+  "isort.args": [
+    /** see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort */
+    "--profile=black"
+  ],
+
   // see also `typescript.inlayHints` settings below
   "javascript.inlayHints.enumMemberValues.enabled": true,
   "javascript.inlayHints.functionLikeReturnTypes.enabled": true,
@@ -59,10 +64,6 @@
     /** Needs a local Black install, like via apt or `pip3 install --user`. */
     "black",
   "python.languageServer": "Pylance",
-  "python.sortImports.args": [
-    /** see https://black.readthedocs.io/en/stable/guides/using_black_with_other_tools.html#isort */
-    "--profile=black"
-  ],
 
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
   /** @deprecated by `telemetryLevel` */ "telemetry.enableTelemetry": false,
