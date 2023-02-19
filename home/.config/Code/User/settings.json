@@ -26,7 +26,7 @@
   "editor.fontLigatures": true,
   "editor.fontSize": 14,
   "editor.formatOnSave": true,
-  "editor.inlayHints.enabled": true,
+  "editor.inlayHints.enabled": "onUnlessPressed",
   "editor.inlayHints.fontFamily": "sans",
   "editor.inlayHints.fontSize": 10,
   "editor.renderControlCharacters": true,
