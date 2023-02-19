@@ -66,6 +66,7 @@
   "telemetry.telemetryLevel": "off",
 
   "terminal.integrated.allowChords": false,
+  "terminal.integrated.enablePersistentSessions": false,
   "terminal.integrated.tabs.enabled": true,
   "terminal.integrated.tabs.focusMode": "singleClick",
 
