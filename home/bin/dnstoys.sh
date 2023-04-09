@@ -4,7 +4,7 @@
 # answer(s) in columns, for example:
 #
 #     $ dnstoys {los-angeles,phoenix,denver,chicago,new-york}/us.time
-#     dig -t TXT @dns.toys +noall +answer los-angeles/us.time phoenix/us.time denver/us.time chicago/us.time new-york/us.time
+#     dig -t TXT @dns.toys +answer los-angeles/us.time phoenix/us.time denver/us.time chicago/us.time new-york/us.time
 #
 #     Los Angeles (America/Los_Angeles, US)  Mon, 18 Jul 2022 05:30:05 -0700
 #     Phoenix (America/Phoenix, US)          Mon, 18 Jul 2022 05:30:05 -0700
@@ -18,7 +18,7 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
-command=(dig -t TXT @dns.toys +noall +answer "$@")
+command=(dig -t TXT @dns.toys +answer "$@")
 if [ $# -eq 0 ]; then
   command+=(help)
 fi
@@ -28,8 +28,15 @@ echo "${command[@]}" >&2
 echo >&2
 
 "${command[@]}" |
-  cut --delimiter '"' --fields 2- |
-  sed \
-    --expression 's/" "/|/g' \
-    --expression 's/"$//' |
+  grep -E '^[^;]+' |
+  cut -d'"' -f2- |
+  sed -e 's/" "/|/g' -e 's/"$//' |
+  while read -r line; do
+    if [[ $line =~ ^error: ]]; then
+      echo "$line" >&2
+      exit 1
+    else
+      echo "$line"
+    fi
+  done |
   column -ts'|'
