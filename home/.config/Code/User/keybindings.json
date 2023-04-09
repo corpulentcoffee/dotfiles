@@ -28,6 +28,13 @@
     "when": "editorTextFocus && foldingEnabled"
   },
 
+  /** Turn off overtype w/ `Esc` (if nothing else should get `Esc` priority). */
+  {
+    "key": "escape",
+    "command": "overtype.toggle",
+    "when": "editorTextFocus && overtype.isToggledOn && !editorHasMultipleSelections && !notificationToastsVisible && !suggestWidgetVisible"
+  },
+
   // Unneeded/unwanted keybindings from extensions /////////////////////////////
 
   /** Conflicts w/ fold keybinding */
