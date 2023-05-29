@@ -29,6 +29,10 @@
   "editor.inlayHints.enabled": "onUnlessPressed",
   "editor.inlayHints.fontFamily": "sans",
   "editor.inlayHints.fontSize": 10,
+  "editor.multiCursorModifier":
+    /** `ctrlCmd` would be better mousing left-handed having sacrificed `Alt` to
+     * `AltGr` on right, but breaks `terminal.integrated.altClickMovesCursor` */
+    "alt",
   "editor.renderControlCharacters": true,
   "editor.renderWhitespace": "all",
   "editor.rulers": [80],
@@ -76,6 +80,9 @@
   "telemetry.telemetryLevel": "off",
 
   "terminal.integrated.allowChords": false,
+  "terminal.integrated.altClickMovesCursor":
+    /** This feature requires `editor.multiCursorModifier` be set to `alt` */
+    true,
   "terminal.integrated.enablePersistentSessions": false,
   "terminal.integrated.minimumContrastRatio": 1 /* allows dim ANSI colors */,
   "terminal.integrated.tabs.enabled": true,
