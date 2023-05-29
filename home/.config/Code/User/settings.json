@@ -83,6 +83,7 @@
   "terminal.integrated.altClickMovesCursor":
     /** This feature requires `editor.multiCursorModifier` be set to `alt` */
     true,
+  "terminal.integrated.cursorBlinking": true,
   "terminal.integrated.enablePersistentSessions": false,
   "terminal.integrated.minimumContrastRatio": 1 /* allows dim ANSI colors */,
   "terminal.integrated.tabs.enabled": true,
