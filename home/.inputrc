@@ -1,0 +1,25 @@
+# Initialization file for Readline
+# See `man 3 readline` for general syntax information.
+
+$include /etc/inputrc
+
+set enable-bracketed-paste On
+
+# Key bindings
+#
+# - The `bind` bash builtin can be used to query how things are setup
+# - Use something like `stty raw && sleep 5 && echo && stty cooked` to see what
+#   a particular terminal emulator emits for a particular keystroke combination
+#   (e.g. VS Code's integrated terminal sends `Ctrl`+`W` for `Ctrl`+`Backspace`)
+
+# Allow rebinding `\C-w` away from `unix-word-rubout`.
+$if term=xterm
+  set bind-tty-special-chars Off
+$endif
+
+$if mode=emacs
+  "\e[2~": overwrite-mode      # `Insert`: toggle overtype
+  "\C-\b": backward-kill-word  # `Ctrl`+`Backspace`: backspace to previous word delimiter
+  "\C-w": backward-kill-word   # `Ctrl`+`W`: backspace to previous word delimiter
+  "\e\C-?": unix-word-rubout   # `Alt`+`Backspace`: backspace to previous whitespace
+$endif
