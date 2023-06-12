@@ -40,37 +40,38 @@ unset __ccdotfiles_less
 # `nvm` is already available and installed to `~/.nvm`, and NVS is the preferred
 # way of doing things anyway, so just skip this setup if running in Codespaces.
 if [[ ! -v CODESPACES ]]; then
-  if [[ ! -v NVM_DIR && -d ~/.nvm && -f ~/.nvm/nvm.sh ]]; then
-    export NVM_DIR=~/.nvm
-  fi
-  if [[ -v NVM_DIR && -d "$NVM_DIR" && -f "$NVM_DIR/nvm.sh" ]]; then
-    # `--no-use` avoids delay of activating `default` environment for new shells.
+  [[ ! -v NVM_DIR && -d ~/.nvm && -f ~/.nvm/nvm.sh ]] && export NVM_DIR=~/.nvm
+
+  if
     # shellcheck source=/dev/null
-    source "$NVM_DIR/nvm.sh" --no-use &&
+    [[ -v NVM_DIR && -d "$NVM_DIR" && -f "$NVM_DIR/nvm.sh" ]] &&
+      source "$NVM_DIR/nvm.sh" --no-use # skip `default` environment activation
+  then
+    # Explicitly call `nvm use` when `.nvmrc` is present or version it has
+    # changes (due to, e.g., changing directories, moving git `HEAD`, altering
+    # contents manually). Calling `nvm use` explicitly also prints activated
+    # environment and triggering `.nvmrc`. This is one of *many* ways to do
+    # this; see <https://github.com/nvm-sh/nvm#deeper-shell-integration>.
+    function __ccdotfiles_promptCommandNvmrc() {
+      local nvmrc
+      nvmrc=$(nvm_find_nvmrc)
 
-      # Explicitly call `nvm use` when `.nvmrc` is present or version it has
-      # changes (due to, e.g., changing directories, moving git `HEAD`, altering
-      # contents manually). Calling `nvm use` explicitly also prints activated
-      # environment and triggering `.nvmrc`. This is one of *many* ways to do
-      # this; see <https://github.com/nvm-sh/nvm#deeper-shell-integration>.
-      function __ccdotfiles_promptCommandNvmrc {
-        local nvmrc
-        nvmrc=$(nvm_find_nvmrc)
+      local version
+      [ -n "$nvmrc" ] && version=$(<"$nvmrc")
 
-        local version
-        [ -n "$nvmrc" ] && version=$(<"$nvmrc")
-
-        if [ -n "$version" ]; then
-          if [ "$version" != "$__ccdotfiles_promptCommandNvmrc_last" ]; then
-            nvm use
-            __ccdotfiles_promptCommandNvmrc_last=$version
-          fi
-        elif [ -n "$__ccdotfiles_promptCommandNvmrc_last" ]; then
-          nvm deactivate
-          unset __ccdotfiles_promptCommandNvmrc_last
+      if [ -n "$version" ]; then
+        if [ "$version" != "$__ccdotfiles_promptCommandNvmrc_last" ]; then
+          nvm use
+          __ccdotfiles_promptCommandNvmrc_last=$version
         fi
-      } &&
-        PROMPT_COMMAND="__ccdotfiles_promptCommandNvmrc; $PROMPT_COMMAND"
+      elif [ -n "$__ccdotfiles_promptCommandNvmrc_last" ]; then
+        nvm deactivate
+        unset __ccdotfiles_promptCommandNvmrc_last
+      fi
+    }
+
+    [[ $PROMPT_COMMAND =~ __ccdotfiles_promptCommandNvmrc ]] ||
+      PROMPT_COMMAND="__ccdotfiles_promptCommandNvmrc; $PROMPT_COMMAND"
   fi
 fi
 
