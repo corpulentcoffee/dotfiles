@@ -141,7 +141,7 @@ def get_credential_cache(prog: str):
     """
 
     from appdirs import user_cache_dir
-    from botocore.credentials import JSONFileCache
+    from botocore.utils import JSONFileCache
 
     our_cache_dir = user_cache_dir(appname=prog)  # e.g. ~/.cache/aws-as-role/
     credential_cache = JSONFileCache(working_dir=our_cache_dir)
