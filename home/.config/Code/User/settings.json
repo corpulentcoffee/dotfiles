@@ -103,7 +103,7 @@
   },
 
   "[python]": {
-    "editor.defaultFormatter": "ms-python.python",
+    "editor.defaultFormatter": "ms-python.black-formatter",
     "editor.rulers": [
       /** documentation */ { "column": 72, "color": "#333" },
       /** regular lines */ 79
