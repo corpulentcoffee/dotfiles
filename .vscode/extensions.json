@@ -17,10 +17,14 @@
     /** Provide autoformatting for shell scripts and some others. */
     "foxundermoon.shell-format",
 
+    /** Python autoformatting; separate from `ms-python.python` as of Fall 2023;
+     * @see https://github.com/microsoft/vscode-python/wiki/Migration-to-Python-Tools-Extensions */
+    "ms-python.black-formatter",
+
     /**
-     * Autoformatting, typechecking and more. Automatically enables Pyright by
-     * installing the `ms-python.vscode-pylance` extension and import sorting w/
-     * the `ms-python.isort` extension. This also installs some Jupyter-related
+     * Typechecking and more. Automatically enables Pyright by installing the
+     * `ms-python.vscode-pylance` extension and import sorting w/ the
+     * `ms-python.isort` extension. This also installs some Jupyter-related
      * extensions, but those can be disabled w/o affecting Python functionality.
      */
     "ms-python.python",
