@@ -1,3 +1,5 @@
+version: "1"
+
 aliases:
     # Additional notes on how aliases work (correct as of March 2021):
     # - Aliases trying to override the built-in subcommands (like `repo`) aren't
