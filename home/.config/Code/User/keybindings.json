@@ -9,7 +9,7 @@
   {
     "key": "alt+enter",
     "command": "editor.action.openLink",
-    "when": "editorFocus && !findWidgetVisible"
+    "when": "editorTextFocus"
   },
 
   /** Go to next fold; complements `Alt`+`]` (go to next suggestion) and
