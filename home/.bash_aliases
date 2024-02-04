@@ -4,6 +4,39 @@
 # and/or that will only be used interactively. Most other things probably belong
 # as scripts in the bin/ directory.
 
+if command -v xclip >&/dev/null && xhost >&/dev/null; then
+  function cb() {
+    if [[ -t 0 ]]; then # stdin interactive: start of pipeline or no pipeline at all
+      cbpaste "$@"
+    elif [[ -t 1 ]]; then # stdout interactive: end of pipeline
+      cbcopy "$@"
+    else # neither interactive: middle of pipeline
+      tee >(cbcopy "$@")
+    fi
+  }
+
+  function cbcopy() { tee >(cbcopycb "$@") | cbcopypri "$@"; }
+  function cbcopycb() { xclip -in -rmlastnl -selection clipboard "$@" >/dev/null; }
+  function cbcopypri() { xclip -in -rmlastnl -selection primary "$@" >/dev/null; }
+
+  function cbpaste() {
+    local cb pri
+    cb=$(cbpastecb "$@")
+    pri=$(cbpastepri "$@")
+
+    if [[ -n $cb ]]; then
+      if [[ -n $pri && $cb != "$pri" ]]; then
+        echo "${FUNCNAME[0]}: clipboard and primary differ; using clipboard" >&2
+      fi
+      echo "$cb"
+    elif [[ -n $pri ]]; then
+      echo "$pri"
+    fi
+  }
+  function cbpastecb() { xclip -out -selection clipboard "$@"; }
+  function cbpastepri() { xclip -out -selection primary "$@"; }
+fi
+
 alias cd-dotfiles='cd "$(whereis-dotfiles)"'
 
 # Like Ubuntu's `ll`, except order directories first.
