@@ -12,8 +12,8 @@
 {
   "editor.codeActionsOnSave": {
     "source.organizeImports":
-      /** For Python, requires Microsoft's Python extension. */
-      true
+      /** For Python, requires Microsoft's Python and `isort` extensions. */
+      "explicit"
   },
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "editor.fontFamily":
