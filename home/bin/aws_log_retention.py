@@ -93,9 +93,9 @@ def get_parser():
             1827,
             3653,
         ],
-        type=lambda value: "forever"
-        if value.strip().lower() == "forever"
-        else int(value, 10),
+        type=lambda value: (
+            "forever" if value.strip().lower() == "forever" else int(value, 10)
+        ),
     )
     parser.add_argument(
         "--dry-run",
@@ -169,9 +169,7 @@ def get_desc(retention: Retention) -> str:
     return (
         "never expires"
         if retention is None
-        else "one day"
-        if retention == 1
-        else f"{retention} days"
+        else "one day" if retention == 1 else f"{retention} days"
     )
 
 
