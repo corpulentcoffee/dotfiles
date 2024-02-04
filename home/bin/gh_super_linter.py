@@ -112,9 +112,11 @@ def get_docker_container_image_version(step_spec: dict) -> Optional[str]:
         return (
             DEFAULT_VERSION
             if uses == LINTER_NAME
-            else uses.split("@", 1)[1]
-            if uses.startswith(f"{LINTER_NAME}@")
-            else None
+            else (
+                uses.split("@", 1)[1]
+                if uses.startswith(f"{LINTER_NAME}@")
+                else None
+            )
         )
 
 
@@ -215,11 +217,7 @@ def get_env_value_as_str(value) -> str:
     return (
         "true"
         if value is True
-        else "false"
-        if value is False
-        else ""
-        if not value
-        else str(value)
+        else "false" if value is False else "" if not value else str(value)
     )
 
 
