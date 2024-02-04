@@ -49,12 +49,14 @@ function open-terminal() {
     fi
   done
 
-  if [[ $# -eq 0 ]]; then
-    x-terminal-emulator
-  else
-    for arg in "$@"; do
-      (cd "$arg" && x-terminal-emulator)
-    done
+  if [[ $# -eq 0 ]]; then (
+    x-terminal-emulator &
+    disown
+  ); else
+    for arg in "$@"; do (
+      cd "$arg" && x-terminal-emulator &
+      disown
+    ); done
   fi
 }
 
