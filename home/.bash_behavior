@@ -75,6 +75,34 @@ if [[ ! -v CODESPACES ]]; then
   fi
 fi
 
+# Avail `pyenv`, possibly lazily. Once `pyenv` is activated, it stays activated.
+[[ ! -v PYENV_ROOT && -x $HOME/.pyenv/bin/pyenv ]] && export PYENV_ROOT=$HOME/.pyenv
+if [[ -v PYENV_ROOT && -x $PYENV_ROOT/bin/pyenv ]] && ! command -v pyenv; then
+  function pyenv() {
+    unset pyenv __ccdotfiles_promptCommandPyenv
+    PROMPT_COMMAND="${PROMPT_COMMAND/__ccdotfiles_promptCommandPyenv;/}"
+
+    echo 'Initializing pyenv shell integration' >&2
+    [[ ":$PATH:" == *":$PYENV_ROOT/bin:"* ]] || PATH="$PYENV_ROOT/bin:$PATH"
+    eval "$(command pyenv init -)" # creates another `pyenv` shell function
+    pyenv "$@"
+  }
+
+  if [[ -f $PWD/.python-version ]]; then # load immediately
+    echo "Starting at $PWD with .python-version" >&2
+    pyenv version
+  else # load upon seeing `.python-version` *or* explicit invocation by user
+    function __ccdotfiles_promptCommandPyenv() {
+      [[ -f $PWD/.python-version ]] || return
+      echo "Now at $PWD with .python-version" >&2
+      pyenv version
+    }
+
+    [[ $PROMPT_COMMAND =~ __ccdotfiles_promptCommandPyenv ]] ||
+      PROMPT_COMMAND="__ccdotfiles_promptCommandPyenv;$PROMPT_COMMAND"
+  fi
+fi
+
 # Perform enhancements to the `PS1` bash prompt. Hints and suggestions:
 #
 # - avoid newlines, e.g.: `less` with `--quit-if-one-screen` assumes prompt that
