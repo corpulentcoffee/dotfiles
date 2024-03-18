@@ -19,7 +19,6 @@ fi
 pip=pip3
 pip=$(command -v "$pip")
 
-# TODO add more checks here? e.g. `|| command -v pyenv` ? be more paranoid? check PATH?
 if [[ -v PYENV_ROOT && -n $PYENV_ROOT && $pip == "$PYENV_ROOT/shims/"* ]]; then
   installVersion=$(pyenv version-name)
   if [[ $installVersion =~ ^3\.[0-9]+\.[0-9]+$ ]]; then
@@ -50,7 +49,7 @@ done <<<"$(
 )"
 
 if [[ ${#outdatedVersions[@]} -eq 0 ]]; then
-  echo '   ... nothing needs updating'
+  echo '.. nothing needs updating'
   exit 0
 fi
 
