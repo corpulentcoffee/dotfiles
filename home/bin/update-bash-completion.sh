@@ -51,8 +51,9 @@ mkdir --parents --verbose "$userDirectory"
 
 installUserCompletion() {
   if command -v "$1" >/dev/null; then
-    local systemFile="$systemDirectory/$1"
-    local userFile="$userDirectory/$1"
+    local command="${1##*/}"
+    local systemFile="$systemDirectory/$command"
+    local userFile="$userDirectory/$command"
 
     if [ -e "$systemFile" ]; then
       echo "$1 already provided by system-wide $systemFile"
@@ -62,7 +63,8 @@ installUserCompletion() {
     elif [ -L "$userFile" ]; then
       echo "warning: refusing to overwrite $userFile symlink" >&2
     else
-      echo "$* >$userFile"
+      echo "$@"
+      echo "  >$userFile"
 
       local completionContent
       if completionContent=$("$@") && [ -n "$completionContent" ]; then
@@ -99,4 +101,30 @@ installUserCompletion minikube completion bash
   installUserCompletion npm completion
 )
 
-installUserCompletion pip3 completion --bash
+[[ -v VIRTUAL_ENV ]] || (
+  # FIXME: `installUserCompletion` knows if the file was written and what its
+  # contents were; move this into that function via variable? e.g.
+  #
+  #     aliases='pip pip3' installUserCompletion /usr/bin/pip3.10 completion --bash
+  #
+  # and
+  #
+  #    if [[ -v aliases ]]; then; ...; fi
+
+  systemPip=$(find /usr/bin/pip3.?? | sort -V | tail -1) || exit 0
+  mainCommand="${systemPip##*/}"
+  installUserCompletion "$systemPip" completion --bash
+
+  if [[ "$(($(date +%s) - $(stat -c %Y "$userDirectory/$mainCommand")))" -lt 5 ]] &&
+    grep -q "_pip_completion ${mainCommand}\$" "$userDirectory/$mainCommand"; then
+    for aliasCommand in pip3 pip; do
+      (
+        substitution=(sed "s/${mainCommand}/${aliasCommand}/" "$userDirectory/$mainCommand")
+        userFile="$userDirectory/$aliasCommand"
+        echo "${substitution[@]}"
+        echo "  >$userFile"
+        "${substitution[@]}" >"$userFile"
+      )
+    done
+  fi
+)
