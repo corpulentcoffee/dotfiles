@@ -1,25 +1,57 @@
 #!/usr/bin/env bash
 #
-# Do an upgrade of all pip packages using the current environment's `pip3`,
-# which may be the system `pip3`, or may be e.g. some `pyenv`-supplied one.
+# Attempt to upgrade all pip packages using whatever the environment's current
+# notion of `pip3` is (e.g. virtualenv-supplied, pyenv-supplied, system).
 
 set -euETo pipefail
 shopt -s inherit_errexit
 
-isUser=false
-if [[ $# -gt 0 ]]; then
-  if [[ $# -eq 1 && $1 == --user ]]; then
-    isUser=true
-  else
-    echo "usage: $0 [--user]" >&2
-    exit 1
-  fi
+sawAll=false
+listCmd=(list --outdated --exclude-editable)
+upgrCmd=(install --upgrade)
+cliArgs=$(
+  getopt --name "$0" \
+    --options ha \
+    --longoptions help,all,exclude:,user,upgrade-strategy: \
+    -- "$@"
+)
+eval set -- "$cliArgs"
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+  --help | -h)
+    echo Usage:
+    echo "  $0 [--all] [--exclude=<pkg>] [--user] [--upgrade-strategy=eager]"
+    exit 0
+    ;;
+  --all | -a) sawAll=true ;;
+  --exclude) shift && listCmd+=(--exclude "$1") ;;
+  --user) listCmd+=(--user) && upgrCmd+=(--user) ;;
+  --upgrade-strategy) shift && upgrCmd+=(--upgrade-strategy "$1") ;;
+  *) break ;;
+  esac
+  shift
+done
+if [[ $* != -- ]]; then
+  echo "$0: unexpected trailing arguments" >&2
+  echo "$@" >&2
+  exit 1
 fi
+[[ $sawAll == true ]] || listCmd+=(--not-required)
 
 pip=pip3
 pip=$(command -v "$pip")
 
-if [[ -v PYENV_ROOT && -n $PYENV_ROOT && $pip == "$PYENV_ROOT/shims/"* ]]; then
+if [[ -v VIRTUAL_ENV ]]; then
+  if [[ ${listCmd[*]} =~ ' --user' ]]; then
+    echo "$0 is not intended to be used in a virtualenv with --user." >&2
+    exit 1
+  elif ! [[ $pip == "$VIRTUAL_ENV/bin/"* ]]; then
+    echo "we are supposedly using $VIRTUAL_ENV but pip is $pip " >&2
+    exit 1
+  fi
+  listCmd+=(--local)
+  upgrCmd+=(--local)
+elif [[ -v PYENV_ROOT && -n $PYENV_ROOT && $pip == "$PYENV_ROOT/shims/"* ]]; then
   installVersion=$(pyenv version-name)
   if [[ $installVersion =~ ^3\.[0-9]+\.[0-9]+$ ]]; then
     echo "!! $pip shim to '$installVersion'" >&2
@@ -27,7 +59,7 @@ if [[ -v PYENV_ROOT && -n $PYENV_ROOT && $pip == "$PYENV_ROOT/shims/"* ]]; then
     echo "$0 refusing to use $pip shim to '$installVersion'" >&2
     exit 1
   fi
-elif ! [[ $isUser == true ]]; then
+elif ! [[ ${listCmd[*]} =~ ' --user' ]]; then
   echo "$0 refusing to use system $pip w/o --user" >&2
   exit 1
 fi
@@ -44,7 +76,7 @@ while IFS=' ' read -ra line; do
 done <<<"$(
   (
     set -x
-    "$pip" list "$@" --not-required --outdated --format=json
+    "$pip" "${listCmd[@]}" --format=json
   ) | jq -r '.[] | "\(.name) \(.version) \(.latest_version)"'
 )"
 
@@ -61,4 +93,4 @@ read -rp "   OK? "
 [[ $REPLY =~ ^[Yy] ]] || exit 1
 
 set -x
-exec "$pip" install "$@" --upgrade -- "${!outdatedVersions[@]}"
+exec "$pip" "${upgrCmd[@]}" -- "${!outdatedVersions[@]}"

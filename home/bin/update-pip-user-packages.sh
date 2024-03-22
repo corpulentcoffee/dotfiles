@@ -12,6 +12,11 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
+if [[ -v VIRTUAL_ENV ]]; then
+  echo "$0 is not intended to be used in a virtualenv." >&2
+  exit 1
+fi
+
 readonly pip=pip3
 readonly expectedPip=/usr/bin/$pip
 
@@ -23,7 +28,7 @@ readonly actualPip
 
 if ! [ "$actualPip" == "$expectedPip" ]; then
   echo "The current $pip tool is $actualPip rather than $expectedPip." >&2
-  echo "If using pyenv or inside virtualenv, deactivate before running $0." >&2
+  echo "If using pyenv or similar, deactivate before running $0." >&2
   exit 1
 fi
 
