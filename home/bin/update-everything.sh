@@ -14,6 +14,8 @@ declare -ar commands=(
   # updates done within user home directory that do not require sudo
   update-awscli2-install
   update-nvm-install
+  update-pyenv-install
+  update-pip-pyenv-packages
   update-pip-user-packages
 
   # prior updates might affect completion output, so that goes last

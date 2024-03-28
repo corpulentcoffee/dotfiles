@@ -51,8 +51,9 @@ mkdir --parents --verbose "$userDirectory"
 
 installUserCompletion() {
   if command -v "$1" >/dev/null; then
-    local systemFile="$systemDirectory/$1"
-    local userFile="$userDirectory/$1"
+    local command="${1##*/}"
+    local systemFile="$systemDirectory/$command"
+    local userFile="$userDirectory/$command"
 
     if [ -e "$systemFile" ]; then
       echo "$1 already provided by system-wide $systemFile"
@@ -62,7 +63,8 @@ installUserCompletion() {
     elif [ -L "$userFile" ]; then
       echo "warning: refusing to overwrite $userFile symlink" >&2
     else
-      echo "$* >$userFile"
+      echo "$@"
+      echo "  >$userFile"
 
       local completionContent
       if completionContent=$("$@") && [ -n "$completionContent" ]; then
@@ -99,4 +101,8 @@ installUserCompletion minikube completion bash
   installUserCompletion npm completion
 )
 
-installUserCompletion pip3 completion --bash
+[[ -v VIRTUAL_ENV ]] || (
+  for systemPip in /usr/bin/pip{,3{,.??}}; do
+    installUserCompletion "$systemPip" completion --bash
+  done
+)
