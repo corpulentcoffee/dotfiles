@@ -102,29 +102,7 @@ installUserCompletion minikube completion bash
 )
 
 [[ -v VIRTUAL_ENV ]] || (
-  # FIXME: `installUserCompletion` knows if the file was written and what its
-  # contents were; move this into that function via variable? e.g.
-  #
-  #     aliases='pip pip3' installUserCompletion /usr/bin/pip3.10 completion --bash
-  #
-  # and
-  #
-  #    if [[ -v aliases ]]; then; ...; fi
-
-  systemPip=$(find /usr/bin/pip3.?? | sort -V | tail -1) || exit 0
-  mainCommand="${systemPip##*/}"
-  installUserCompletion "$systemPip" completion --bash
-
-  if [[ "$(($(date +%s) - $(stat -c %Y "$userDirectory/$mainCommand")))" -lt 5 ]] &&
-    grep -q "_pip_completion ${mainCommand}\$" "$userDirectory/$mainCommand"; then
-    for aliasCommand in pip3 pip; do
-      (
-        substitution=(sed "s/${mainCommand}/${aliasCommand}/" "$userDirectory/$mainCommand")
-        userFile="$userDirectory/$aliasCommand"
-        echo "${substitution[@]}"
-        echo "  >$userFile"
-        "${substitution[@]}" >"$userFile"
-      )
-    done
-  fi
+  for systemPip in /usr/bin/pip{,3{,.??}}; do
+    installUserCompletion "$systemPip" completion --bash
+  done
 )
