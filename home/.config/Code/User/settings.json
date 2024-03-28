@@ -68,10 +68,7 @@
   "python.analysis.inlayHints.variableTypes": true,
   "python.analysis.typeCheckingMode": "strict",
   "python.formatting.provider":
-    /**
-     * Needs a local Black install, like via apt or `pip3 install --user`.
-     * @see isort.args for compatibility purposes
-     */
+    /** @see isort.args for compatibility purposes */
     "black",
   "python.languageServer": "Pylance",
   "python.terminal.activateEnvironment":
