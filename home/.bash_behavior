@@ -77,7 +77,7 @@ fi
 
 # Avail `pyenv`, possibly lazily. Once `pyenv` is activated, it stays activated.
 [[ ! -v PYENV_ROOT && -x $HOME/.pyenv/bin/pyenv ]] && export PYENV_ROOT=$HOME/.pyenv
-if [[ -v PYENV_ROOT && -x $PYENV_ROOT/bin/pyenv ]] && ! command -v pyenv; then
+if [[ -v PYENV_ROOT && -x $PYENV_ROOT/bin/pyenv ]] && ! command -v pyenv >/dev/null; then
   function pyenv() {
     unset pyenv __ccdotfiles_promptCommandPyenv
     PROMPT_COMMAND="${PROMPT_COMMAND/__ccdotfiles_promptCommandPyenv;/}"
