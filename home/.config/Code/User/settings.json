@@ -72,7 +72,7 @@
     "black",
   "python.languageServer": "Pylance",
   "python.terminal.activateEnvironment":
-    /** can be a nuisance; generally not needed with `.python-version` files */
+    /** nuisance if already detecting `.python-version`s via `PROMPT_COMMAND` */
     false,
 
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,
