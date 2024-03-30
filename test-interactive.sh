@@ -15,11 +15,14 @@ case $- in
   ;;
 esac
 
+cd ~/bin
+dotfiles=$(basename "$(realpath "$(whereis-dotfiles)")")
+test -n "$dotfiles"
 set -x
 
 # Verify everything in bin is executable and we aren't accidentally conflicting
 # with a system-wide bin command, an alias, or some shell built-in.
-for path in ~/bin/*; do
+for path in *; do
   test -f "$path"
   test -x "$path" # will also fail on a dangling symlink
 
@@ -27,6 +30,15 @@ for path in ~/bin/*; do
 
   # If the user path contains ~/bin multiple times, then `type -a` will also
   # output multiple times, so `sort --unique` is used here to de-duplicate.
-  test "$(type -ap "$command" | sort --unique)" == "$HOME/bin/$command"
+  if ! test "$(type -ap "$command" | sort --unique)" == "$HOME/bin/$command"; then
+    # Tolerate shadowed commands off CI as long as a non-dotfiles symlink.
+
+    test ! -v CI
+    test -L "$path"
+
+    resolvedPath="$(realpath "$(readlink "$path")")"
+    test -n "$resolvedPath"
+    [[ ! $resolvedPath =~ $dotfiles ]]
+  fi
   test "$(type -at "$command" | sort --unique)" == 'file'
 done
