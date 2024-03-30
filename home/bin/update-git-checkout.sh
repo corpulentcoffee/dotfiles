@@ -26,7 +26,7 @@ display=${display#.}
 
 active=$(git describe --tags HEAD)
 if ! [[ $active == v*.*.* ]]; then
-  echo "Current tag '$active' for $display doesn't look like a version" >&2
+  echo "Active tag '$active' for $display doesn't look like a version" >&2
   exit 1
 fi
 
