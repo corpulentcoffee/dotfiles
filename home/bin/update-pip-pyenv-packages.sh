@@ -10,7 +10,10 @@
 set -euETo pipefail
 shopt -s inherit_errexit
 
-if ! [[ -v PYENV_ROOT && -n $PYENV_ROOT && -x $PYENV_ROOT/bin/pyenv ]]; then
+if [[ -v VIRTUAL_ENV ]]; then
+  echo "$0 is not intended to be used in a virtualenv." >&2
+  exit 1
+elif ! [[ -v PYENV_ROOT && -n $PYENV_ROOT && -x $PYENV_ROOT/bin/pyenv ]]; then
   echo "Refusing to run $0 without valid PYENV_ROOT" >&2
   exit 1
 fi
