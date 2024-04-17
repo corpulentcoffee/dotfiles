@@ -1,0 +1,7 @@
+#!/usr/bin/env -S bash -euETo pipefail -O inherit_errexit
+
+me=$(realpath -e "${BASH_SOURCE[0]}")
+parent=$(dirname "$me")
+shrink=$(realpath -e "$parent/../../../../bin/shrink.sh")
+
+exec gnome-terminal -- "$shrink" "$@"
