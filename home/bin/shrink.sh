@@ -21,8 +21,21 @@ pngShrink() (
 
 ################################################################################
 
+assumeYes=false # can be enabled during parsing of `$@` below
+
+compare() {
+  if [[ $assumeYes != true ]]; then
+    xdg-open "$1"
+    sleep 0.25s
+    xdg-open "$2"
+  fi
+}
+
 confirm() {
-  if ! [[ -t 0 && -t 2 ]]; then
+  if [[ $assumeYes == true ]]; then
+    echo "$1? y" >&2
+    return 0
+  elif ! [[ -t 0 && -t 2 ]]; then
     echo "$1? n" >&2
     return 1
   fi
@@ -75,25 +88,46 @@ typename() {
 
 ################################################################################
 
+errors=()
+paths=()
+sawDashdash=false
+for arg in "$@"; do # ... or use `getopt` if this becomes more complicated
+  if [[ -z $arg ]]; then
+    :
+  elif [[ $sawDashdash == false && $arg =~ ^- ]]; then
+    if [[ $arg =~ ^(-y|--yes|--assume-yes)$ ]]; then
+      assumeYes=true
+    elif [[ $arg == -- ]]; then
+      sawDashdash=true
+    else
+      errors+=("unrecognized option '$arg'")
+    fi
+  elif [[ -n $arg ]]; then
+    paths+=("$arg")
+  fi
+done
+
 declare -A destinations=() # source path -> destination path
-if [[ $# -ge 2 && -d ${!#} ]]; then
-  directory=${!#}
+if [[ ${#paths[@]} -ge 2 && -d ${paths[-1]} ]]; then
+  directory=${paths[-1]}
   directory=${directory%/} # e.g. './abc/ -> './abc', '/' -> ''
-  sources=("${@:1:$#-1}")
+  sources=("${paths[@]:0:${#paths[@]}-1}")
   for source in "${sources[@]}"; do
     destinations[$source]=$directory/${source##*/}
   done
-elif [[ $# -eq 2 && ! -e $2 ]] && [[ $(typename "$1") == $(typename "$2") ]]; then
-  sources=("$1")
-  destinations[$1]=$2
+elif
+  [[ ${#paths[@]} -eq 2 && ! -e ${paths[1]} ]] &&
+    [[ $(typename "${paths[0]}") == $(typename "${paths[1]}") ]]
+then
+  sources=("${paths[0]}")
+  destinations[${paths[0]}]=${paths[1]}
 else
-  sources=("$@")
+  sources=("${paths[@]}")
   for source in "${sources[@]}"; do
     destinations[$source]=$source
   done
 fi
 
-errors=()
 declare -A sizes=() # source path -> original file size in bytes
 for i in "${!sources[@]}"; do
   source=${sources[$i]}
@@ -159,8 +193,7 @@ for source in "${sources[@]}"; do
     elif ! [[ $shrunken -lt $size ]]; then
       echo "shrunken file isn't any smaller than original"
     else
-      xdg-open "$source"
-      xdg-open "$temporary"
+      compare "$source" "$temporary"
 
       test -L "$temporary" && die "$temporary unexpectedly a symlink"
       if [[ $source == "$destination" ]]; then
