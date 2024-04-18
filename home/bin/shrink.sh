@@ -135,7 +135,7 @@ for source in "${sources[@]}"; do
   first=false
 
   size=${sizes[$source]}
-  echo "$source ($size)"
+  echo "$source"
 
   destination=${destinations[$source]}
   type=$(typename "$source")
