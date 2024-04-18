@@ -30,6 +30,26 @@ confirm() {
   [[ $REPLY =~ ^[Yy] ]]
 }
 
+descshrink() {
+  local delta="$(($1 - $2))"
+  printf "%s \u2212 %s[%.0f%%] = %s\n" \
+    "$(descsize "$1")" \
+    "$(descsize "$delta")" "$(bc -l <<<"$delta / $1 * 100")" \
+    "$(descsize "$2")"
+}
+
+descsize() { # roughly like size output w/ `ls -hl` *without* `--si`
+  if [[ $1 -ge 1073741824 ]]; then
+    printf '%.0fG\n' "$(bc -l <<<"$1 / 1073741824")"
+  elif [[ $1 -ge 1048576 ]]; then
+    printf '%.0fM\n' "$(bc -l <<<"$1 / 1048576")"
+  elif [[ $1 -ge 1024 ]]; then
+    printf '%.0fK\n' "$(bc -l <<<"$1 / 1024")"
+  else
+    echo "$1b"
+  fi
+}
+
 die() {
   echo "$@" >&2
   exit 1
@@ -144,11 +164,16 @@ for source in "${sources[@]}"; do
 
       test -L "$temporary" && die "$temporary unexpectedly a symlink"
       if [[ $source == "$destination" ]]; then
-        if confirm "shrunk TODO; replace $destination"; then
+        if
+          confirm "replace $destination ($(descshrink "$size" "$shrunken"))"
+        then
           mv --verbose -- "$temporary" "$destination"
           continue
         fi
-      elif confirm "$source (shrunk TODO) -> $destination"; then
+      elif
+        confirm \
+          "shrunken $source ($(descshrink "$size" "$shrunken")) -> $destination"
+      then
         mv --verbose -- "$temporary" "$destination"
         rm --verbose -- "$source"
         continue
@@ -158,7 +183,10 @@ for source in "${sources[@]}"; do
     rm --verbose -- "$temporary"
   fi
 
-  if [[ $source != "$destination" ]] && confirm "original $source -> $destination? "; then
+  if
+    [[ $source != "$destination" ]] &&
+      confirm "original $source ($(descsize "$size")) -> $destination"
+  then
     mv --verbose -- "$source" "$destination"
   fi
 done
