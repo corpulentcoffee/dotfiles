@@ -2,9 +2,24 @@
 #
 # Attempt to shrink (and optionally move) individual files.
 
+readonly JPEG_WIDTH=900
+readonly JPEG_HEIGHT=900
+readonly JPEG_COLORSPACE=gray
+readonly JPEG_QUALITY=70
 jpegShrink() (
-  set -x
-  cp -- "$1" "$2" # TODO
+  IFS=' ' read -r format width height colorspace quality \
+    <<<"$(identify -ping -format '%m %w %h %[colorspace] %Q' -- "$1")"
+
+  if [[ "${format,,}" != 'jpeg' ]]; then
+    echo 'not a JPEG'
+  elif [[ $width -le $JPEG_WIDTH && "$height" -le $JPEG_HEIGHT &&
+    ${colorspace,,} == "$JPEG_COLORSPACE" && $quality -le $JPEG_QUALITY ]]; then
+    echo "already ${width}x$height in ${colorspace} @ ${quality}%"
+  else
+    set -x
+    convert -resize "${JPEG_WIDTH}x${JPEG_HEIGHT}>" \
+      -colorspace "$JPEG_COLORSPACE" -quality "$JPEG_QUALITY" -- "$1" "$2"
+  fi
 )
 
 pdfShrink() (
