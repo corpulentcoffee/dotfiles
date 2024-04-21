@@ -26,12 +26,12 @@ pdfShrink() (
   set -x
   gs -q -dBATCH -dNOPAUSE -dCompressFonts=true -dCompressPages=true \
     -dDetectDuplicateImages -dPDFSETTINGS=/screen \
-    -sDEVICE=pdfwrite -sOutputFile="$2" "$1"
+    -sDEVICE=pdfwrite -sOutputFile="$2" -- "$1"
 )
 
 pngShrink() (
   set -x
-  optipng "$1" -o7 -zm1-9 -clobber -out "$2"
+  optipng -o7 -zm1-9 -clobber -out "$2" -- "$1"
 )
 
 ################################################################################
