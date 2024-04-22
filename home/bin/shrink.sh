@@ -43,6 +43,7 @@ compare() {
     xdg-open "$1"
     sleep 0.25s
     xdg-open "$2"
+    sleep 0.25s
   fi
 }
 
