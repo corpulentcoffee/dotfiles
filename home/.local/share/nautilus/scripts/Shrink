@@ -1,0 +1,23 @@
+#!/usr/bin/env -S bash -euETo pipefail -O inherit_errexit
+
+me=$(realpath -e "${BASH_SOURCE[0]}")
+parent=$(dirname "$me")
+shrink=$(realpath -e "$parent/../../../../bin/shrink.sh")
+
+paths=()
+for arg in "$@"; do # ... or use `NAUTILUS_SCRIPT_SELECTED_FILE_PATHS` or similar
+  if [[ -d $arg ]]; then
+    readarray -d '' -O "${#paths[@]}" paths \
+      < <(find "$arg" -type f -print0 | sort -z)
+  else
+    paths+=("$arg")
+  fi
+done
+
+exec gnome-terminal -- \
+  bash -c '
+    "$@"
+    echo
+    read -rp "press enter to exit... "
+  ' -- \
+  "$shrink" -- "${paths[@]}"
