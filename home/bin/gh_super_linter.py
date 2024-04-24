@@ -2,8 +2,8 @@
 """
 Run GitHub's Super-Linter locally using Docker.
 
-{LINTER_NAME} will be pulled and ran. See
-<https://github.com/github/super-linter/blob/master/docs/run-linter-locally.md>
+{DOCKER_IMAGE} will be pulled to run {GITHUB_ACTION}. See
+<https://github.com/super-linter/super-linter/blob/main/docs/run-linter-locally.md>
 for more information.
 """
 
@@ -12,7 +12,8 @@ from os import getcwd
 from pathlib import Path
 from typing import Any, Callable, List, Optional
 
-LINTER_NAME = "github/super-linter"  # both GitHub Action and Docker image name
+DOCKER_IMAGE = "ghcr.io/super-linter/super-linter"
+GITHUB_ACTION = "super-linter/super-linter"
 DEFAULT_VERSION = "latest"
 CODEBASE_MOUNT = "/tmp/lint"
 
@@ -111,10 +112,10 @@ def get_docker_container_image_version(step_spec: dict) -> Optional[str]:
     else:
         return (
             DEFAULT_VERSION
-            if uses == LINTER_NAME
+            if uses == GITHUB_ACTION
             else (
                 uses.split("@", 1)[1]
-                if uses.startswith(f"{LINTER_NAME}@")
+                if uses.startswith(f"{GITHUB_ACTION}@")
                 else None
             )
         )
@@ -199,10 +200,10 @@ def run_docker_container(
         )
         for key, value in setup.env.items():
             args.extend(["--env", f"{key}={get_env_value_as_str(value)}"])
-        args.append(f"{LINTER_NAME}:{setup.img}")
+        args.append(f"{DOCKER_IMAGE}:{setup.img}")
     else:
         print(f"Using {DEFAULT_VERSION} Super-Linter without any environment.")
-        args.append(f"{LINTER_NAME}:{DEFAULT_VERSION}")
+        args.append(f"{DOCKER_IMAGE}:{DEFAULT_VERSION}")
 
     print()
     print("Would invoke Docker with:" if dry_run else "Starting Docker...")
