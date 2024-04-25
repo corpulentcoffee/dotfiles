@@ -15,7 +15,17 @@ if command -v xclip >&/dev/null && xhost >&/dev/null; then
     fi
   }
 
-  function cbcopy() { tee >(cbcopycb "$@") | cbcopypri "$@"; }
+  function cbcopy() {
+    local buffer
+    buffer=$(</dev/stdin)
+    if [[ -n "$buffer" ]]; then
+      cbcopycb "$@" <<<"$buffer"
+      cbcopypri "$@" <<<"$buffer"
+    else
+      echo "${FUNCNAME[0]}: nothing to copy; leaving clipboard as-is" >&2
+    fi
+    # ... or just `tee >(cbcopycb "$@") | cbcopypri "$@"` to skip this check
+  }
   function cbcopycb() { xclip -in -rmlastnl -selection clipboard "$@" >/dev/null; }
   function cbcopypri() { xclip -in -rmlastnl -selection primary "$@" >/dev/null; }
 
