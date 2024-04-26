@@ -56,6 +56,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+          BASH_EXEC_IGNORE_LIBRARIES: true # e.g. `test-interactive.sh`
+
           VALIDATE_JSON:
             # `jsonlint` doesn't support "JSON with comments", as used by Visual
             # Studio Code (see https://github.com/zaach/jsonlint/issues/50), and
