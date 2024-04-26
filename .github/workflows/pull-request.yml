@@ -46,7 +46,7 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0 # required by super-linter to see changes across commits
-      - uses: github/super-linter@v6
+      - uses: super-linter/super-linter@v6.4.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # for individual lint status
 
