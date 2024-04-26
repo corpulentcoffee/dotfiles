@@ -40,14 +40,14 @@ def main():
 
 
 def get_parser():
-    assert type(__doc__) is str, "expecting module-level docstring"
+    assert isinstance(__doc__, str), "expecting module-level docstring"
     description, epilog = __doc__.split("\n\n")
     parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
         "--profile",
         help="""
-            use named AWS profile (e.g. "development") or omit to use
-            environment variables
+            use named AWS profile (e.g. "development") for querying and setting
+            log retention or omit to use environment variables
         """,
     )
     parser.add_argument(

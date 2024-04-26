@@ -32,7 +32,7 @@ def get_parser():
     from argparse import ArgumentParser
     from os.path import abspath, isdir
 
-    assert type(__doc__) is str, "expecting module-level docstring"
+    assert isinstance(__doc__, str), "expecting module-level docstring"
     description, epilog = __doc__.format(**globals()).split("\n\n")
     parser = ArgumentParser(description=description, epilog=epilog)
 

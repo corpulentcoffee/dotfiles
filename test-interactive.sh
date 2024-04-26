@@ -1,8 +1,7 @@
-#!/usr/bin/env bash
+# shellcheck shell=bash
 #
 # The tests in this file inspect aliases and shell functions, so it's intended
-# to be run inside an interactive shell (e.g. `bash -i test-interactive.sh`);
-# the shebang above is just so tools recognize that this is a bash shell script.
+# to be run inside an interactive shell (e.g. `bash -i test-interactive.sh`).
 
 set -euETo pipefail
 shopt -s inherit_errexit
