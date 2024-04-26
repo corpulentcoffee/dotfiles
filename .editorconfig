@@ -1,0 +1,6 @@
+# Mostly here for `shfmt`; see <https://github.com/mvdan/sh/issues/393> and
+# <https://editorconfig.org> for more information.
+
+[[shell]]
+indent_style = space
+indent_size = 2
