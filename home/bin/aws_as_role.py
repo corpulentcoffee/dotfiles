@@ -49,7 +49,7 @@ def get_parser():
     from argparse import ArgumentParser
 
     # if changing this interface, review aws-as-profile's usage of aws-as-role
-    assert type(__doc__) is str, "expecting module-level docstring"
+    assert isinstance(__doc__, str), "expecting module-level docstring"
     description, epilog = __doc__.split("\n\n")
     parser = ArgumentParser(description=description, epilog=epilog)
     parser.add_argument(
