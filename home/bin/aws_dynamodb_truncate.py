@@ -48,8 +48,8 @@ def get_parser():
     parser.add_argument(
         "--profile",
         help="""
-            use named AWS profile (e.g. "development") or omit to use
-            environment variables
+            use named AWS profile (e.g. "development") for scanning and
+            deleting table items or omit to use environment variables
         """,
     )
     parser.add_argument(
