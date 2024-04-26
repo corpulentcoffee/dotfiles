@@ -1,5 +1,5 @@
-# Mostly here for `shfmt`; see <https://github.com/mvdan/sh/issues/393> and
-# <https://editorconfig.org> for more information.
+# Mostly here for `shfmt` in the Super-linter run done with pull requests; see
+# <https://github.com/mvdan/sh/issues/393> and <https://editorconfig.org>.
 
 [[shell]]
 indent_style = space
