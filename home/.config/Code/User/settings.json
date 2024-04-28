@@ -38,6 +38,10 @@
   "editor.rulers": [80],
   "editor.tabSize": 2,
 
+  "files.exclude": {
+    "**/__pycache__": true
+  },
+
   "isort.args": [
     /**
      * @see python.formatting.provider below
