@@ -1,4 +1,9 @@
 #!/usr/bin/env bash
+#
+# Create a symlink in user `$HOME` for each in-repo file in `./home/`.
+#
+# The core part of this is sort of like GNU `stow --adopt --target=$HOME home`,
+# though this script has a bunch of special handling around the `bin` directory.
 
 case "$BASH_VERSION" in # see also same check in `test.sh`
 5.*) ;;
