@@ -84,12 +84,27 @@ die() {
   exit 1
 }
 
+exist() {
+  local path
+  for path in "$@"; do
+    [[ -e $path ]] || return 1
+  done
+}
+
 extname() {
   if [[ $1 =~ [^/]\.[a-zA-Z0-9]+$ ]]; then
     echo "${1##*.}"
   else
     echo ''
   fi
+}
+
+homogenous() {
+  local expected path
+  expected=$(typename "$1")
+  for path in "${@:2}"; do
+    [[ $expected == $(typename "$path") ]] || return 1
+  done
 }
 
 declare -rA canonicalizations=([jpg]=jpeg)
@@ -132,11 +147,23 @@ if [[ ${#paths[@]} -ge 2 && -d ${paths[-1]} ]]; then
     destinations[$source]=$directory/${source##*/}
   done
 elif
-  [[ ${#paths[@]} -eq 2 && ! -e ${paths[1]} ]] &&
-    [[ $(typename "${paths[0]}") == $(typename "${paths[1]}") ]]
+  [[ ${#paths[@]} -eq 2 && ! -e ${paths[1]} ]] && homogenous "${paths[@]}"
 then
   sources=("${paths[0]}")
   destinations[${paths[0]}]=${paths[1]}
+elif
+  [[ ${#paths[@]} -ge 3 ]] && exist "${paths[@]:0:${#paths[@]}-1}" &&
+    [[ ! -e "${paths[-1]}" ]] && homogenous "${paths[@]}" &&
+    toExtname=$(extname "${paths[-1]}") && [[ -n $toExtname ]]
+then
+  sources=("${paths[@]:0:${#paths[@]}-1}")
+  toBasename=${paths[-1]%.$toExtname}
+  toCount=${#sources[@]}
+  toWidth=${#toCount}
+  for i in "${!sources[@]}"; do
+    destinations[${sources[i]}]=$(printf '%s-%0*d.%s' \
+      "$toBasename" "$toWidth" $((i + 1)) "$toExtname")
+  done
 else
   sources=("${paths[@]}")
   for source in "${sources[@]}"; do
@@ -173,6 +200,7 @@ if ! [[ ${#errors[@]} -eq 0 && ${#sources[@]} -ge 1 ]]; then
     echo
   fi
   echo "usage:"
+  echo "  $0 file-1.png file-2.png ~/directory/new-base-name.png"
   echo "  $0 file-1.pdf file-2.jpeg ~/directory/  # shrink then move"
   echo "  $0 file-old-name.pdf file-new-name.pdf  # shrink then rename"
   echo "  $0 file-1.pdf file-2.jpeg other-3.jpeg  # shrink in-place"
