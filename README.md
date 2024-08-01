@@ -18,8 +18,8 @@ warranty of any kind._
     creating their directories, allowing finer control over which files are kept
     in version control
   - for better ergonomics, [`bin` scripts](home/bin) are symlinked without their
-    extension; additionally, Python scripts are symlinked in kebab case (which
-    is easier to type) rather than the in-repository snake case (which is
+    extension; additionally, Python scripts are symlinked in `kebab-case` (which
+    is easier to type) rather than the in-repository `snake_case` (which is
     `import`able)
 - many environments ship their own `~/.bashrc` with environment-specific items
   and interoperability with those setups is done by not including `home/.bashrc`
