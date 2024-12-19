@@ -5,9 +5,6 @@
  */
 {
   "recommendations": [
-    /** Avail an overtype mode that is togglable by the `Insert` key. */
-    "drmerfy.overtype" /* was `adammaras.overtype`, but that's now abandoned */,
-
     /**
      * Provide autoformatting for markdown, JSON, YAML, and some others. See
      * `.prettierrc.yml` for options controlling autoformatting behavior.

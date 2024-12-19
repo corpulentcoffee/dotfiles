@@ -33,6 +33,8 @@
     /** `ctrlCmd` would be better mousing left-handed having sacrificed `Alt` to
      * `AltGr` on right, but breaks `terminal.integrated.altClickMovesCursor` */
     "alt",
+  "editor.overtypeCursorStyle": "block",
+  "editor.overtypeOnPaste": true,
   "editor.renderControlCharacters": true,
   "editor.renderWhitespace": "all",
   "editor.rulers": [80],
