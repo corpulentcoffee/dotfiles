@@ -78,7 +78,8 @@
     "black",
   "python.languageServer": "Pylance",
   "python.terminal.activateEnvironment":
-    /** nuisance if already detecting `.python-version`s via `PROMPT_COMMAND` */
+    /** nuisance if already detecting `.python-version`s and/or virtual
+     * environments via `PROMPT_COMMAND` or other shell scripting mechanisms */
     false,
 
   /** @deprecated by `telemetryLevel` */ "telemetry.enableCrashReporter": false,

@@ -3,11 +3,14 @@
 # Do an upgrade of all pip packages that were directly installed (i.e. not as a
 # dependency) via system `pip3`/`python3` in "user-site" (i.e. with `--user`).
 #
-# On typical Ubuntu installs, these are
+# On older Ubuntu installs, these are
 #
 # - libraries installed to `~/.local/lib/python3.x/site-packages/`,
 # - command-line tools installed to `~/.local/bin`, and,
 # - less commonly, ancillary files (e.g. completion) placed into `~/.local/etc`.
+#
+# Newer Ubuntus follow PEP 668 w/ a `/usr/lib/python3.x/EXTERNALLY-MANAGED` file
+# that _discourages_ user-site packages, making this script less relevant.
 
 set -euETo pipefail
 shopt -s inherit_errexit
