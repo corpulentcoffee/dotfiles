@@ -18,7 +18,7 @@ for command in "$fwupdmgr" "$sudo"; do
 done
 
 if ! output=$("$sudo" "$fwupdmgr" refresh 2>&1); then
-  if [[ "$output" == *"metadata last refresh"*"--force to refresh"* ]]; then
+  if [[ "${output,,}" == *"metadata"*"--force to refresh"* ]]; then
     echo "$output" # we're handling this error, so send to stdout
     "$sudo" "$fwupdmgr" refresh --force
   else # send any other unrecognized message to stderr and bail out
