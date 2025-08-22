@@ -13,7 +13,7 @@ from pathlib import Path
 from typing import Any, Callable, List, Optional
 
 DOCKER_IMAGE = "ghcr.io/super-linter/super-linter"
-GITHUB_ACTION = "github/super-linter"
+GITHUB_ACTION = "super-linter/super-linter"
 DEFAULT_VERSION = "latest"
 CODEBASE_MOUNT = "/tmp/lint"
 
