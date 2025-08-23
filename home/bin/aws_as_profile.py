@@ -9,8 +9,8 @@ environment variables.
 You must have an {PROFILE_PATH} similar to this:
 
   [organization]
-  aws_access_key_id = XXXXXXXXXXXXXXXXXXXX
-  aws_secret_access_key = xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+  aws_access_key_id = XXXXX
+  aws_secret_access_key = xxxxx
 
   [production]
   role_arn = arn:aws:iam::NNNNNNNNNN:role/OrganizationAccountAccessRole
